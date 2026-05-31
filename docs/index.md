@@ -33,7 +33,7 @@ Laravel Controller
 
 | Package | Description |
 |---|---|
-| `mdaushi/kinetics-laravel` | PHP/Laravel package — server side |
+| `mdaushi/kinetics` | PHP/Laravel package — server side |
 | `@mdaushi/kinetics-react` | React package — ready-to-use components & hook |
 
 ## Documentation

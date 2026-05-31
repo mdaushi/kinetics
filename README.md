@@ -75,7 +75,7 @@ Laravel Controller
 **1. Laravel (server-side)**
 
 ```bash
-composer require mdaushi/kinetics-laravel
+composer require mdaushi/kinetics
 ```
 
 **2. React (client-side)**
@@ -104,7 +104,7 @@ pnpm add @inertiajs/react @tanstack/react-table  # peer dependencies
 
 | Package | Description |
 |---|---|
-| `mdaushi/kinetics-laravel` | PHP/Laravel package — server-side pipeline, columns, actions |
+| `mdaushi/kinetics` | PHP/Laravel package — server-side pipeline, columns, actions |
 | `@mdaushi/kinetics-react` | React package — `<Table>` component, `useTable` hook |
 
 ---

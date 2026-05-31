@@ -1,11 +1,11 @@
 # Backend (Laravel)
 
-The `mdaushi/kinetics-laravel` package handles all server-side logic: reading request parameters, running the query pipeline (sort, search, filter, paginate), and returning the result ready to be consumed by Inertia.
+The `mdaushi/kinetics` package handles all server-side logic: reading request parameters, running the query pipeline (sort, search, filter, paginate), and returning the result ready to be consumed by Inertia.
 
 ## Installation
 
 ```bash
-composer require mdaushi/kinetics-laravel
+composer require mdaushi/kinetics
 ```
 
 The package is automatically registered via Laravel Package Auto-Discovery.

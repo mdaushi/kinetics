@@ -67,10 +67,10 @@ jobs:
 
             **Laravel (Packagist)**
             ```bash
-            composer require mdaushi/kinetics-laravel:${{ github.ref_name }}
+            composer require mdaushi/kinetics:${{ github.ref_name }}
             ```
 
             **React (dari vendor path)**
             ```bash
-            npm install ./vendor/mdaushi/kinetics-laravel/packages/react
+            npm install ./vendor/mdaushi/kinetics/packages/react
             ```
