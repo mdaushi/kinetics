@@ -1,0 +1,20 @@
+
+/packages/react/src export-ignore
+/packages/react/node_modules export-ignore
+/packages/react/tsup.config.ts export-ignore
+/packages/react/tsconfig.json export-ignore
+/packages/react/tailwind.config.js export-ignore
+/packages/react/package-lock.json export-ignore
+
+/packages/core/src export-ignore
+/packages/core/node_modules export-ignore
+/packages/core/tsconfig.json export-ignore
+
+/packages/vue export-ignore
+/tests export-ignore
+/docs export-ignore
+/.phpunit.cache export-ignore
+/phpunit.xml export-ignore
+/pnpm-lock.yaml export-ignore
+/pnpm-workspace.yaml export-ignore
+/package.json export-ignore

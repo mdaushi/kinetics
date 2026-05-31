@@ -62,15 +62,3 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          body: |
-            ## Install
-
-            **Laravel (Packagist)**
-            ```bash
-            composer require mdaushi/kinetics:${{ github.ref_name }}
-            ```
-
-            **React (dari vendor path)**
-            ```bash
-            npm install ./vendor/mdaushi/kinetics/packages/react
-            ```

@@ -81,8 +81,7 @@ composer require mdaushi/kinetics
 **2. React (client-side)**
 
 ```bash
-pnpm add @mdaushi/kinetics-react
-pnpm add @inertiajs/react @tanstack/react-table  # peer dependencies
+pnpm add vendor/mdaushi/kinetics/packages/react @tanstack/react-table
 ```
 
 ---
