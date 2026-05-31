@@ -86,12 +86,7 @@ class Table
      */
     public function perPage(int $default, int $max = 100): static
     {
-        $this->config = new TableConfig(
-            defaultPerPage: $default,
-            maxPerPage: $max,
-            defaultSort: $this->config->defaultSort,
-            defaultDirection: $this->config->defaultDirection,
-        );
+        $this->config = $this->config->with(defaultPerPage: $default, maxPerPage: $max);
         return $this;
     }
 
@@ -100,12 +95,7 @@ class Table
      */
     public function defaultSort(string $column, string $direction = 'desc'): static
     {
-        $this->config = new TableConfig(
-            defaultPerPage: $this->config->defaultPerPage,
-            maxPerPage: $this->config->maxPerPage,
-            defaultSort: $column,
-            defaultDirection: $direction,
-        );
+        $this->config = $this->config->with(defaultSort: $column, defaultDirection: $direction);
         return $this;
     }
 
@@ -163,8 +153,8 @@ class Table
 
         if (
             ! (is_string($pipe)
-            ? is_subclass_of($pipe, PipeInterface::class)
-            : $pipe instanceof PipeInterface)
+                ? is_subclass_of($pipe, PipeInterface::class)
+                : $pipe instanceof PipeInterface)
         ) {
             throw InvalidPipeException::doesNotImplementInterface($class);
         }
@@ -173,12 +163,14 @@ class Table
     // Output methods
 
     /**
-     * Run the pipeline and return a ready-to-use array in Inertia.
+     * Run the pipeline and return a plain array.
+     * Use this for Inertia responses or any place that expects a plain array.
      *
-     * Contoh:
-     *   return Inertia::render('Users/Index', [
-     *       'table' => Table::model(User::class)->columns([...])->make(),
-     *   ]);
+     *   // Inertia
+     *   return Inertia::render('Users/Index', ['table' => Table::model(User::class)->make()]);
+     *
+     *   // JSON API
+     *   return response()->json(Table::model(User::class)->make());
      */
     public function make(): array
     {
@@ -186,7 +178,22 @@ class Table
     }
 
     /**
-     * Return raw TableResult (for testing or API JSON).
+     * Run the pipeline and return a TableResult instance.
+     * Prefer this over make() when you need to inspect specific parts
+     * of the result — for example in tests or JSON APIs:
+     *
+     *   $result = Table::model(User::class)->get();
+     *
+     *   $result->getData();        // transformed rows
+     *
+     *   $result->getTotal();       // total row count
+     *
+     *   $result->getMeta();        // pagination meta
+     *
+     *   $result->getPaginator();   // raw LengthAwarePaginator
+     *
+     *   // Works directly with response()->json() via JsonSerializable
+     *   return response()->json($result);
      */
     public function get(): TableResult
     {
@@ -194,11 +201,13 @@ class Table
     }
 
     /**
-     * Return only the paginator (bypass TableResult formatting).
+     * Run the pipeline and return only the raw LengthAwarePaginator,
+     * bypassing TableResult formatting entirely.
+     * Useful when you need full control over the response shape.
      */
     public function paginate(): LengthAwarePaginator
     {
-        $context = $this->buildContext();
+        $this->buildContext();
         return $this->runPipeline();
     }
 

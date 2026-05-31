@@ -14,6 +14,26 @@ class TableConfig
     ) {
     }
 
+    /**
+     * Return a new instance with the given fields overridden.
+     * Keeps all other values intact — avoids reconstructing the whole object.
+     */
+    public function with(
+        ?int $defaultPerPage = null,
+        ?int $maxPerPage = null,
+        ?string $defaultSort = null,
+        ?string $defaultDirection = null,
+    ): static {
+        return new static(
+            defaultPerPage: $defaultPerPage ?? $this->defaultPerPage,
+            maxPerPage: $maxPerPage ?? $this->maxPerPage,
+            defaultSort: $defaultSort ?? $this->defaultSort,
+            defaultDirection: $defaultDirection ?? $this->defaultDirection,
+            preserveKeys: $this->preserveKeys,
+            optionsPerPage: $this->optionsPerPage,
+        );
+    }
+
     // public static function fromArray(array $config): static
     // {
     //     return new static(

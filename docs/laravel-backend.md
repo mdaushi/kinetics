@@ -157,7 +157,50 @@ Run the pipeline and return an `array` ready to use in an Inertia response.
 
 ### `->get()`
 
-Same as `make()` but returns a `TableResult` instance (useful for testing or JSON APIs).
+Same as `make()` but returns a `TableResult` instance instead of a plain array.
+
+**For JSON APIs** — `TableResult` implements `JsonSerializable`, so it works directly with `response()->json()`:
+
+```php
+return response()->json(Table::model(User::class)->get());
+```
+
+**For testing** — `TableResult` exposes granular accessors so you can assert specific parts of the response without parsing a raw array:
+
+```php
+$result = Table::model(User::class)
+    ->columns([...])
+    ->get();
+
+$result->getData();        // array — transformed row data
+$result->getMeta();        // array — current_page, last_page, per_page, total, from, to
+$result->getState();       // array — sort, direction, search, filters, per_page
+$result->getColumns();     // array — column definitions
+
+$result->getTotal();       // int   — total rows matching the query
+$result->getCurrentPage(); // int
+$result->getLastPage();    // int
+$result->getPerPage();     // int
+$result->getPaginator();   // LengthAwarePaginator — raw paginator for advanced inspection
+```
+
+Example in a PHPUnit test:
+
+```php
+public function test_users_table_returns_paginated_data(): void
+{
+    User::factory()->count(30)->create();
+
+    $result = Table::model(User::class)
+        ->columns([Column::make('name')->sortable()])
+        ->withRequest(Request::create('/', 'GET', ['per_page' => 10]))
+        ->get();
+
+    $this->assertCount(10, $result->getData());
+    $this->assertEquals(30, $result->getTotal());
+    $this->assertEquals(3, $result->getLastPage());
+}
+```
 
 ---
 

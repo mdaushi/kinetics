@@ -11,7 +11,7 @@ use Kinetics\Support\TableContext;
  * Converts LengthAwarePaginator + TableContext
  * into a shape ready for consumption by FE (TanStack Table).
  */
-class TableResult
+class TableResult implements \JsonSerializable
 {
     public function __construct(
         private readonly LengthAwarePaginator $paginator,
@@ -20,17 +20,97 @@ class TableResult
     ) {
     }
 
+    /**
+     * Called automatically by json_encode() / response()->json().
+     */
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
+    }
+
     public function toArray(): array
     {
         return [
-            'data' => $this->transformData(),
-            'columns' => $this->transformColumns(),
-            'meta' => $this->buildMeta(),
-            'state' => $this->buildState(),
+            'data' => $this->getData(),
+            'columns' => $this->getColumns(),
+            'meta' => $this->getMeta(),
+            'state' => $this->getState(),
         ];
     }
 
-    // Data: apply formatters + resolve ActionColumn per-row
+    /**
+     * Transformed row data (formatters + action columns applied).
+     */
+    public function getData(): array
+    {
+        return $this->transformData();
+    }
+
+    /**
+     * Pagination meta
+     */
+    public function getMeta(): array
+    {
+        return $this->buildMeta();
+    }
+
+    /**
+     * Current request state
+     */
+    public function getState(): array
+    {
+        return $this->buildState();
+    }
+
+    /**
+     * Column definitions serialized for the frontend.
+     */
+    public function getColumns(): array
+    {
+        return $this->transformColumns();
+    }
+
+    /**
+     * Total number of rows matching the current query.
+     */
+    public function getTotal(): int
+    {
+        return $this->paginator->total();
+    }
+
+    /**
+     * Current page number.
+     */
+    public function getCurrentPage(): int
+    {
+        return $this->paginator->currentPage();
+    }
+
+    /**
+     * Last page number.
+     */
+    public function getLastPage(): int
+    {
+        return $this->paginator->lastPage();
+    }
+
+    /**
+     * Items per page.
+     */
+    public function getPerPage(): int
+    {
+        return $this->paginator->perPage();
+    }
+
+    /**
+     * Raw Laravel LengthAwarePaginator — for advanced inspection in tests.
+     */
+    public function getPaginator(): LengthAwarePaginator
+    {
+        return $this->paginator;
+    }
+
+    // Internal builders
 
     private function transformData(): array
     {
@@ -68,8 +148,6 @@ class TableResult
             ->toArray();
     }
 
-    // Column definitions for TanStack Table
-
     private function transformColumns(): array
     {
         return collect($this->columns)
@@ -77,8 +155,6 @@ class TableResult
             ->values()
             ->toArray();
     }
-
-    // Pagination meta
 
     private function buildMeta(): array
     {
@@ -91,8 +167,6 @@ class TableResult
             'to' => $this->paginator->lastItem(),
         ];
     }
-
-    // Current state (sort, search, filters) — dipakai FE untuk sync UI
 
     private function buildState(): array
     {
