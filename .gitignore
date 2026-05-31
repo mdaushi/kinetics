@@ -1,4 +1,7 @@
-/.phpunit.cache
-composer.lock
-/vendor
-/packages/vue
+vendor/
+node_modules/
+packages/*/node_modules/
+packages/*/dist/
+packages/vue
+dist/
+.phpunit.cache

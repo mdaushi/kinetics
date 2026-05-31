@@ -1,0 +1,14 @@
+{
+  "name": "kinetics-laravel",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "dev": "pnpm -r run dev",
+    "build:core": "pnpm --filter @mdaushi/kinetics-core run build",
+    "build:react": "pnpm --filter @mdaushi/kinetics-react run build"
+  },
+  "devDependencies": {
+    "typescript": "^5.0"
+  }
+}
