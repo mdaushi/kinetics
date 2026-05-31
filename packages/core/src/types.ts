@@ -54,12 +54,14 @@ export interface TableAction {
   icon: string | null;
   variant: "default" | "destructive";
   href: string | null;
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  method: Method;
   modal: boolean;
   disabled: boolean;
   confirm: TableActionConfirm | null;
   meta: Record<string, unknown>;
 }
+
+export type Method = "get" | "post" | "put" | "patch" | "delete";
 
 export interface TableActionGroup {
   type: "group";

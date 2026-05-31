@@ -18,7 +18,7 @@ class Action
     private ?string $icon = null;
     private string $variant = 'default';
     private ?string $href = null;
-    private string $method = 'GET';
+    private string $method = 'get';
     private bool $asModal = false;
     private ?\Closure $visibleWhen = null;
     private ?\Closure $disabledWhen = null;
@@ -65,7 +65,7 @@ class Action
             ->icon('trash')
             ->variant('destructive')
             ->href($routePattern ?? ':id')
-            ->method('DELETE')
+            ->method('delete')
             ->confirm('Are you sure you want to delete this record?');
     }
 
@@ -116,7 +116,10 @@ class Action
     }
 
     /**
-     * HTTP methods for requests (GET, POST, PUT, PATCH, DELETE).
+     * Set method.
+     *
+     * @param 'get'|'post'|'put'|'patch'|'delete' $method
+     * @return static
      */
     public function method(string $method): static
     {
