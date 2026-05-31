@@ -16,7 +16,7 @@ class Action
     private string $key;
     private string $label;
     private ?string $icon = null;
-    private string $variant = 'default';
+    private string $variant = 'outline';
     private ?string $href = null;
     private string $method = 'get';
     private bool $asModal = false;
@@ -45,7 +45,7 @@ class Action
         return static::make('edit')
             ->label('Edit')
             ->icon('pencil')
-            ->variant('default')
+            ->variant('outline')
             ->href($routePattern ?? ':id/edit');
     }
 
@@ -54,7 +54,7 @@ class Action
         return static::make('view')
             ->label('View')
             ->icon('eye')
-            ->variant('default')
+            ->variant('outline')
             ->href($routePattern ?? ':id');
     }
 
@@ -86,12 +86,12 @@ class Action
     /**
      * Set the styling variant.
      *
-     * @param 'default'|'destructive' $variant
+     * @param 'default'|'destructive'|'ghost'|'outline' $variant
      * @return static
      */
     public function variant(string $variant): static
     {
-        $allowedVariants = ['default', 'destructive'];
+        $allowedVariants = ['default', 'destructive', 'ghost', 'outline'];
 
         if (!in_array($variant, $allowedVariants, true)) {
             throw new \InvalidArgumentException(
@@ -198,18 +198,18 @@ class Action
         }
 
         return [
-            'key'      => $this->key,
-            'label'    => $this->label,
-            'icon'     => $this->icon,
-            'variant'  => $this->variant,
-            'href'     => $this->resolveHref($rowArr),
-            'method'   => $this->method,
-            'modal'    => $this->asModal,
+            'key' => $this->key,
+            'label' => $this->label,
+            'icon' => $this->icon,
+            'variant' => $this->variant,
+            'href' => $this->resolveHref($rowArr),
+            'method' => $this->method,
+            'modal' => $this->asModal,
             'disabled' => $isDisabled,
-            'confirm'  => $this->requiresConfirmation ? [
+            'confirm' => $this->requiresConfirmation ? [
                 'message' => $this->confirmationMessage,
             ] : null,
-            'meta'     => $this->meta,
+            'meta' => $this->meta,
         ];
     }
 
