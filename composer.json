@@ -50,6 +50,27 @@
     "config": {
         "sort-packages": true
     },
+    "archive": {
+        "exclude": [
+            "packages/react/src",
+            "packages/react/node_modules",
+            "packages/react/tsup.config.ts",
+            "packages/react/tsconfig.json",
+            "packages/react/tailwind.config.js",
+            "packages/react/package-lock.json",
+            "packages/core/src",
+            "packages/core/node_modules",
+            "packages/core/tsconfig.json",
+            "packages/vue",
+            "tests",
+            "docs",
+            ".phpunit.cache",
+            "phpunit.xml",
+            "pnpm-lock.yaml",
+            "pnpm-workspace.yaml",
+            "package.json"
+        ]
+    },
     "minimum-stability": "stable",
     "prefer-stable": true
 }

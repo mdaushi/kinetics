@@ -2,6 +2,5 @@ vendor/
 node_modules/
 packages/*/node_modules/
 packages/*/dist/
-packages/vue
-dist/
+packages/vue/
 .phpunit.cache

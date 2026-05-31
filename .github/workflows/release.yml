@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    name: Build JS & Publish Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # diperlukan untuk commit + push tag
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Checkout detached di tag, tapi kita perlu push balik
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      - name: Install JS dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @mdaushi/kinetics-core
+        run: pnpm --filter @mdaushi/kinetics-core run build
+
+      - name: Build @mdaushi/kinetics-react
+        run: pnpm --filter @mdaushi/kinetics-react run build
+
+      - name: Commit built dist/ to the release tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Force add karena folder dist/ ada di .gitignore
+          git add -f packages/core/dist packages/react/dist
+
+          # Hanya commit jika ada perubahan
+          if git diff --cached --quiet; then
+            echo "dist/ sudah up-to-date, skip commit."
+          else
+            git commit -m "chore: build dist for ${{ github.ref_name }} [skip ci]"
+
+            # Pindahkan tag ke commit terbaru (yang sudah include dist/)
+            git tag -f ${{ github.ref_name }}
+            git push origin ${{ github.ref_name }} --force
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            ## Install
+
+            **Laravel (Packagist)**
+            ```bash
+            composer require mdaushi/kinetics-laravel:${{ github.ref_name }}
+            ```
+
+            **React (dari vendor path)**
+            ```bash
+            npm install ./vendor/mdaushi/kinetics-laravel/packages/react
+            ```
