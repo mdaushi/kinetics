@@ -73,7 +73,9 @@ class ActionColumn extends Column
             ->map(function ($definition) use ($row) {
                 if ($definition instanceof Action) {
                     $resolved = $definition->resolve($row);
-                    if (empty($resolved)) return null;
+                    if (empty($resolved)) {
+                        return null;
+                    }
                     return array_merge(['type' => 'action'], $resolved);
                 }
 

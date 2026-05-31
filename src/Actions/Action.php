@@ -102,12 +102,12 @@ class Action
         return $this;
     }
 
-    /** 
-     * URL with :column_key placeholder for dynamic routes. 
-     * 
-     * Example: 
-     * ->href('/users/:id/edit') 
-     * ->href('/orgs/:org_id/users/:id') 
+    /**
+     * URL with :column_key placeholder for dynamic routes.
+     *
+     * Example:
+     * ->href('/users/:id/edit')
+     * ->href('/orgs/:org_id/users/:id')
      */
     public function href(string $href): static
     {
@@ -136,11 +136,11 @@ class Action
         return $this;
     }
 
-    /** 
-     * Per-row visibility conditions. 
-     * 
-     * Example: 
-     * ->visibleWhen(fn($row) => $row->status === 'draft') 
+    /**
+     * Per-row visibility conditions.
+     *
+     * Example:
+     * ->visibleWhen(fn($row) => $row->status === 'draft')
      */
     public function visibleWhen(\Closure $condition): static
     {
@@ -148,11 +148,11 @@ class Action
         return $this;
     }
 
-    /** 
-     * Per-row disabled condition. 
-     * 
-     * Example: 
-     * ->disabledWhen(fn($row) => ! auth()->user()->can('edit', $row)) 
+    /**
+     * Per-row disabled condition.
+     *
+     * Example:
+     * ->disabledWhen(fn($row) => ! auth()->user()->can('edit', $row))
      */
     public function disabledWhen(\Closure $condition): static
     {

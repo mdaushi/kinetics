@@ -15,10 +15,11 @@ use Illuminate\Database\Eloquent\Builder;
 class DateRangeFilterPipe implements PipeInterface
 {
     public function __construct(
-        private readonly string $column   = 'created_at',
+        private readonly string $column = 'created_at',
         private readonly string $fromParam = 'date_from',
-        private readonly string $toParam   = 'date_to',
-    ) {}
+        private readonly string $toParam = 'date_to',
+    ) {
+    }
 
     public function handle(Builder $query, Closure $next): mixed
     {

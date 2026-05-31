@@ -53,7 +53,7 @@ class Table
     // Static entry points
     public static function model(string $modelClass): static
     {
-        $model = new $modelClass;
+        $model = new $modelClass();
 
         if (! $model instanceof Model) {
             throw new \InvalidArgumentException("{$modelClass} must be an Eloquent Model.");
@@ -161,9 +161,11 @@ class Table
     {
         $class = is_string($pipe) ? $pipe : get_class($pipe);
 
-        if (! (is_string($pipe)
+        if (
+            ! (is_string($pipe)
             ? is_subclass_of($pipe, PipeInterface::class)
-            : $pipe instanceof PipeInterface)) {
+            : $pipe instanceof PipeInterface)
+        ) {
             throw InvalidPipeException::doesNotImplementInterface($class);
         }
     }

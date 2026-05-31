@@ -17,7 +17,8 @@ class TableResult
         private readonly LengthAwarePaginator $paginator,
         private readonly TableContext $context,
         private readonly array $columns,
-    ) {}
+    ) {
+    }
 
     public function toArray(): array
     {

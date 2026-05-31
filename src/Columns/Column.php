@@ -6,14 +6,14 @@ use Kinetics\Contracts\ColumnInterface;
 
 class Column implements ColumnInterface
 {
-    protected string  $key;
-    protected string  $label;
-    protected bool    $sortable    = false;
-    protected bool    $searchable  = false;
-    protected bool    $filterable  = false;
-    protected bool    $visible     = true;
+    protected string $key;
+    protected string $label;
+    protected bool $sortable    = false;
+    protected bool $searchable  = false;
+    protected bool $filterable  = false;
+    protected bool $visible     = true;
     protected ?string $type        = 'text';
-    protected array   $filterOptions = [];
+    protected array $filterOptions = [];
     protected ?string $relation    = null;
     protected ?string $relationKey = null;
     protected ?\Closure $formatUsing = null;
