@@ -9,5 +9,5 @@ export default defineConfig({
   treeshake: true,
 
   // Semua peerDependencies harus di-external.
-  external: ["react", "react-dom", "@inertiajs/react", "@tanstack/react-table"],
+  external: ["react", "react-dom", "@inertiajs/react", "@tanstack/react-table", "lucide-react"],
 });

@@ -35,13 +35,13 @@
     "@base-ui/react": "^1.5.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.17.0",
     "radix-ui": "^1.4.3",
     "shadcn": "^4.8.3",
     "tailwind-merge": "^3.6.0",
     "use-debounce": "^10.0"
   },
   "peerDependencies": {
+    "lucide-react": "^1.17.0",
     "@inertiajs/react": "^3.2.0",
     "@tanstack/react-table": "^8.0",
     "react": "^19.2.0",

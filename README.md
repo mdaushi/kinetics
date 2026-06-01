@@ -8,80 +8,42 @@ Building a table in an Inertia.js app usually means wiring up query parameters, 
 
 Under the hood, the React adapter is built on **TanStack Table** for flexible, headless table logic and **shadcn/ui** for accessible, composable UI components — so you get a polished experience out of the box while retaining full control to customise when needed.
 
----
-
-## Quick Look
-
-**Backend — define your table once:**
-
-```php
-// app/Http/Controllers/UserController.php
-
-public function index()
-{
-    $table = Table::model(User::class)
-        ->columns([
-            Column::make('name')->sortable()->searchable(),
-            Column::make('email')->sortable()->searchable(),
-            Column::make('status')->filterable(['active' => 'Active', 'inactive' => 'Inactive']),
-            ActionColumn::make()->actions([
-                Action::edit('/users/:id/edit'),
-                Action::delete('/users/:id'),
-            ]),
-        ])
-        ->defaultSort('created_at', 'desc')
-        ->make();
-
-    return Inertia::render('Users/Index', ['table' => $table]);
-}
-```
-
-**Frontend — one component, done:**
-
-```tsx
-// resources/js/Pages/Users/Index.tsx
-
-import { Table, TableProps } from '@mdaushi/kinetics-react';
-
-export default function UsersIndex({ table }: { table: TableProps<User> }) {
-    return <Table table={table} searchPlaceholder="Search users..." />;
-}
-```
-
----
-
-## How It Works
-
-```
-Browser Request (sort, search, filter, page)
-        │
-        ▼
-Laravel Controller
-  └─ Table::model() / Table::query()
-       └─ Pipeline: Sort → Search → Filter → Paginate
-              │
-              ▼
-         Inertia Response (data + columns + meta + state)
-              │
-              ▼
-   React Component (<Table /> / useTable)
-     └─ TanStack Table (UI rendering)
-```
-
----
 
 ## Installation
 
-**1. Laravel (server-side)**
+**1. Install the Laravel package**
 
 ```bash
 composer require mdaushi/kinetics
 ```
 
-**2. React (client-side)**
+**2. Install the React package**
 
 ```bash
-pnpm add vendor/mdaushi/kinetics/packages/react @tanstack/react-table
+npm install @mdaushi/kinetics-react
+```
+
+**3. Configure Tailwind CSS**
+
+Since this package uses Tailwind classes, you need to tell Tailwind to scan the package's dist files so those classes are not purged during build.
+
+**Tailwind v4** — add `@source` to `resources/css/app.css`:
+
+```css
+@import "tailwindcss";
+
+@source "../../node_modules/@mdaushi/kinetics-react/dist";
+```
+
+**Tailwind v3** — add the path to `tailwind.config.js`:
+
+```js
+export default {
+  content: [
+    // ... existing paths
+    './node_modules/@mdaushi/kinetics-react/dist/**/*.js',
+  ],
+}
 ```
 
 ---
@@ -101,10 +63,10 @@ pnpm add vendor/mdaushi/kinetics/packages/react @tanstack/react-table
 
 ## Packages
 
-| Package | Description |
-|---|---|
-| `mdaushi/kinetics` | PHP/Laravel package — server-side pipeline, columns, actions |
-| `@mdaushi/kinetics-react` | React package — `<Table>` component, `useTable` hook |
+| Package | Registry | Description |
+|---|---|---|
+| [`mdaushi/kinetics`](https://packagist.org/packages/mdaushi/kinetics) | Packagist | PHP/Laravel package — server-side pipeline, columns, actions |
+| [`@mdaushi/kinetics-react`](https://www.npmjs.com/package/@mdaushi/kinetics-react) | npm | React package — `<Table>` component, `useTable` hook |
 
 ---
 
@@ -143,11 +105,11 @@ pnpm install
 **4. Build the packages**
 
 ```bash
-# Build core types
-cd packages/core && pnpm build
+# Build core types first
+pnpm --filter @mdaushi/kinetics-core run build
 
-# Build the React package
-cd packages/react && pnpm build
+# Then build the React package
+pnpm --filter @mdaushi/kinetics-react run build
 ```
 
 **5. Run the PHP test suite**
@@ -175,6 +137,7 @@ kinetics/
 │   ├── Resources/          # TableResult (response formatter)
 │   └── Support/            # TableConfig, TableContext
 ├── packages/
+│   ├── core/               # @mdaushi/kinetics-core (shared types)
 │   └── react/              # @mdaushi/kinetics-react
 │       └── src/
 │           ├── components/ # <Table>, ActionCell, Toolbar, Pagination

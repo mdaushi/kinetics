@@ -1,5 +1,6 @@
 {
     "name": "mdaushi/kinetics",
+    "description": "Zero-Friction Tables for Inertia.js — sorting, filtering, searching, and pagination through a clean composable pipeline.",
     "type": "library",
     "keywords": [
         "laravel",

@@ -13,6 +13,28 @@ Make sure the following peer dependencies are installed in your React/Inertia pr
 ```bash
 pnpm add @inertiajs/react @tanstack/react-table
 ```
+## Configure Tailwind CSS
+
+Since this package uses Tailwind classes, you need to tell Tailwind to scan the package's dist files so those classes are not purged during build.
+
+**Tailwind v4** — add `@source` to `resources/css/app.css`:
+
+```css
+@import "tailwindcss";
+
+@source "../../node_modules/@mdaushi/kinetics-react/dist";
+```
+
+**Tailwind v3** — add the path to `tailwind.config.js`:
+
+```js
+export default {
+  content: [
+    // ... existing paths
+    './node_modules/@mdaushi/kinetics-react/dist/**/*.js',
+  ],
+}
+```
 
 ---
 
