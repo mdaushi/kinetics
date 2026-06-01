@@ -9,12 +9,9 @@
     "declaration": true,
     "declarationDir": "dist",
     "outDir": "dist",
+    "rootDir": "src",
     "skipLibCheck": true,
-    "esModuleInterop": true,
-    "baseUrl": ".",
-    "paths": {
-      "@mdaushi/kinetics-core": ["../core/src/index.ts"]
-    }
+    "esModuleInterop": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

@@ -3,7 +3,6 @@
 /packages/react/node_modules export-ignore
 /packages/react/tsup.config.ts export-ignore
 /packages/react/tsconfig.json export-ignore
-/packages/react/tailwind.config.js export-ignore
 /packages/react/package-lock.json export-ignore
 
 /packages/core/src export-ignore
