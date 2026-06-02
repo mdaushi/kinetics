@@ -17,7 +17,8 @@ class Action
     private string $label;
     private ?string $icon = null;
     private string $variant = 'outline';
-    private ?string $href = null;
+    /** @var string|\Closure|null */
+    private mixed $href = null;
     private string $method = 'get';
     private bool $asModal = false;
     private ?\Closure $visibleWhen = null;
@@ -41,33 +42,48 @@ class Action
 
     // Preset constructors for common actions
 
-    public static function edit(?string $routePattern): static
+    public static function edit(?string $routeName = null): static
     {
-        return static::make('edit')
+        $action = static::make('edit')
             ->label('Edit')
             ->icon('pencil')
-            ->variant('outline')
-            ->href($routePattern ?? ':id/edit');
+            ->variant('outline');
+
+        if ($routeName) {
+            $action->href($routeName);
+        }
+
+        return $action;
     }
 
-    public static function view(?string $routePattern): static
+    public static function view(?string $routeName = null): static
     {
-        return static::make('view')
+        $action = static::make('view')
             ->label('View')
             ->icon('eye')
-            ->variant('outline')
-            ->href($routePattern ?? ':id');
+            ->variant('outline');
+
+        if ($routeName) {
+            $action->href($routeName);
+        }
+
+        return $action;
     }
 
-    public static function delete(?string $routePattern): static
+    public static function delete(?string $routeName = null): static
     {
-        return static::make('delete')
+        $action = static::make('delete')
             ->label('Delete')
             ->icon('trash')
             ->variant('destructive')
-            ->href($routePattern ?? ':id')
             ->method('delete')
             ->confirm(message: "Are you sure you want to delete this record?");
+
+        if ($routeName) {
+            $action->href($routeName);
+        }
+
+        return $action;
     }
 
     // Fluent API
@@ -104,13 +120,13 @@ class Action
     }
 
     /**
-     * URL with :column_key placeholder for dynamic routes.
+     * Route name for the action, or a closure.
      *
      * Example:
-     * ->href('/users/:id/edit')
-     * ->href('/orgs/:org_id/users/:id')
+     * ->href('users.edit')
+     * ->href(fn($row) => route('users.edit', $row['id']))
      */
-    public function href(string $href): static
+    public function href(string|\Closure $href): static
     {
         $this->href = $href;
         return $this;
@@ -218,19 +234,37 @@ class Action
 
     // Internals
 
-    /**
-     * Replace the :column_key placeholder with the actual value from the row.
-     * Example: '/users/:id/edit' + ['id' => 5] → '/users/5/edit'
-     */
-    private function resolveHref(array $row): ?string
+    private function resolveHref(array|object $row): ?string
     {
         if (! $this->href) {
             return null;
         }
 
-        return preg_replace_callback('/:([a-zA-Z_]+)/', function (array $matches) use ($row) {
-            $key = $matches[1];
-            return $row[$key] ?? $matches[0];
-        }, $this->href);
+        if ($this->href instanceof \Closure) {
+            return ($this->href)($row);
+        }
+
+        $rowArr = is_array($row) ? $row : (array) $row;
+
+        try {
+            $route = app('router')->getRoutes()->getByName($this->href);
+
+            if ($route) {
+                $params = [];
+                foreach ($route->parameterNames() as $name) {
+                    if (array_key_exists($name, $rowArr)) {
+                        $params[$name] = $rowArr[$name];
+                    } elseif (array_key_exists('id', $rowArr)) {
+                        $params[$name] = $rowArr['id'];
+                    }
+                }
+                return route($this->href, $params);
+            }
+
+            return route($this->href, $row);
+        } catch (\Throwable $e) {
+            // Fallback to raw string if it's a URL or invalid route
+            return $this->href;
+        }
     }
 }
