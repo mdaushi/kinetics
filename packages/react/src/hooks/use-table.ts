@@ -10,7 +10,6 @@ import React, { useCallback, useMemo, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import {
   ActionItem,
-  formatValue,
   TableColumn,
   TableMeta,
   TableState,
@@ -19,6 +18,7 @@ import {
 } from "@mdaushi/kinetics-core";
 import { ActionCell } from "../components/action-cell";
 import { TableColumnHeader } from "../components/table-column-header";
+import { Badge } from "../components/ui/badge";
 
 export type { TableProps, TableColumn, TableMeta, TableState };
 
@@ -119,7 +119,32 @@ export function useTable<TData extends Record<string, unknown>>({
           enableColumnFilter: col.filterable,
           cell: ({ getValue }) => {
             const value = getValue();
-            return formatValue(value, col.type);
+            if (col.type === "badge") {
+              const colorMeta = col.meta?.color;
+              let finalColor = "default";
+
+              if (typeof colorMeta === "string") {
+                finalColor = colorMeta;
+              } else if (typeof colorMeta === "object" && colorMeta !== null) {
+                finalColor =
+                  (colorMeta as Record<string, string>)[String(value)] ??
+                  "default";
+              }
+
+              return React.createElement(
+                Badge,
+                {
+                  variant: finalColor as React.ComponentProps<
+                    typeof Badge
+                  >["variant"],
+                },
+                String(value),
+              );
+            }
+
+            const formatted = String(value ?? "—");
+
+            return formatted;
           },
         };
       });

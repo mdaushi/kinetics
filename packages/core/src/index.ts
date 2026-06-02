@@ -11,5 +11,3 @@ export type {
 
 export { TableController } from "./controller";
 export type { TableControllerOptions } from "./controller";
-
-export { formatValue } from "./formatter";

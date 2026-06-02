@@ -4,17 +4,18 @@ namespace Kinetics\Columns;
 
 use Kinetics\Contracts\ColumnInterface;
 
-class Column implements ColumnInterface
+abstract class Column implements ColumnInterface
 {
     protected string $key;
     protected string $label;
-    protected bool $sortable    = false;
-    protected bool $searchable  = false;
-    protected bool $filterable  = false;
-    protected bool $visible     = true;
-    protected ?string $type        = 'text';
+    protected bool $sortable = false;
+    protected bool $searchable = false;
+    protected bool $filterable = false;
+    protected bool $visible = true;
+    protected ?string $type = 'text';
+    protected array $meta = [];
     protected array $filterOptions = [];
-    protected ?string $relation    = null;
+    protected ?string $relation = null;
     protected ?string $relationKey = null;
     protected ?\Closure $formatUsing = null;
 
@@ -71,9 +72,13 @@ class Column implements ColumnInterface
         return $this;
     }
 
-    public function type(string $type): static
+    public function meta(string|array $key, mixed $value = null): static
     {
-        $this->type = $type;
+        if (is_array($key)) {
+            $this->meta = array_merge($this->meta, $key);
+        } else {
+            $this->meta[$key] = $value;
+        }
         return $this;
     }
 
@@ -146,6 +151,7 @@ class Column implements ColumnInterface
             'filterOptions' => $this->filterOptions,
             'visible' => $this->visible,
             'type' => $this->type,
+            'meta' => $this->meta,
         ];
     }
 }

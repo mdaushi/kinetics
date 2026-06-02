@@ -42,7 +42,7 @@ class ActionColumn extends Column
     {
         parent::__construct($this->columnKey);
         $this->label('Actions');
-        $this->type('actions');
+        $this->type = 'actions';
     }
 
     public static function make(string $key = '__actions'): static
@@ -93,13 +93,5 @@ class ActionColumn extends Column
     public function hasActions(): bool
     {
         return ! empty($this->actionDefinitions);
-    }
-
-    public function toArray(): array
-    {
-        return array_merge(parent::toArray(), [
-            'type' => 'actions',
-            'pinned' => 'right', // FE: kolom ini selalu di kanan
-        ]);
     }
 }

@@ -8,15 +8,11 @@ export interface TableColumn {
   filterable: boolean;
   filterOptions: string[] | Record<string, string>;
   visible: boolean;
-  type:
-    | "text"
-    | "date"
-    | "datetime"
-    | "currency"
-    | "badge"
-    | "actions"
-    | string;
+  type: TableColumnType
+  meta: Record<string, unknown>;
 }
+
+export type TableColumnType = "text" | "badge" | "actions" | string;
 
 export interface TableMeta {
   current_page: number;
