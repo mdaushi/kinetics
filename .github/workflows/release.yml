@@ -38,37 +38,13 @@ jobs:
       - name: Build packages
         run: pnpm -r run build
 
-      - name: Commit built dist/ to the release tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Force add folder dist karena di-ignore (.gitignore)
-          git add -f packages/core/dist packages/react/dist
-
-          # Hanya commit dan push jika ada perubahan pada dist/
-          if git diff --cached --quiet; then
-            echo "dist/ sudah up-to-date, skip commit."
-          else
-            git commit -m "chore: build dist for ${{ github.ref_name }} [skip ci]"
-
-            # Update tag lokal ke commit baru, lalu force push ke origin
-            git tag -f ${{ github.ref_name }}
-            git push origin ${{ github.ref_name }} --force
-          fi
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
 
-      - name: Publish @mdaushi/kinetics-core to npm
-        run: pnpm publish --filter @mdaushi/kinetics-core --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Publish @mdaushi/kinetics-react to npm
-        run: pnpm publish --filter @mdaushi/kinetics-react --no-git-checks
+      - name: Publish packages to npm
+        run: pnpm -r publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
