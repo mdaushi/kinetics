@@ -21,7 +21,8 @@ class TextColumn extends Column
      * Set a static color or map specific values to badge colors.
      * Example: 'default' or ['draft' => 'secondary', 'published' => 'default']
      *
-     * @param 'default'|'secondary'|'destructive'|'outline'|'ghost'|'link'|array<string, 'default'|'secondary'|'destructive'|'outline'|'ghost'|'link'> $color
+     * @param 'default'|'secondary'|'destructive'|'outline'|'ghost'|'link'|array<string,
+     * 'default'|'secondary'|'destructive'|'outline'|'ghost'|'link'> $color
      */
     public function color(string|array $color): static
     {

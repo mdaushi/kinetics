@@ -24,6 +24,7 @@ class Action
     private ?\Closure $disabledWhen = null;
     private bool $requiresConfirmation = false;
     private ?string $confirmationMessage = null;
+    private ?string $confirmationTitle = null;
     private array $meta = [];
 
     private function __construct(string $key)
@@ -66,7 +67,7 @@ class Action
             ->variant('destructive')
             ->href($routePattern ?? ':id')
             ->method('delete')
-            ->confirm('Are you sure you want to delete this record?');
+            ->confirm(message: "Are you sure you want to delete this record?");
     }
 
     // Fluent API
@@ -163,10 +164,11 @@ class Action
     /**
      * Display a confirmation dialog before the action is executed.
      */
-    public function confirm(string $message = 'Are you sure?'): static
+    public function confirm(string $title = 'Are you sure?', string $message = ''): static
     {
         $this->requiresConfirmation = true;
         $this->confirmationMessage  = $message;
+        $this->confirmationTitle    = $title;
         return $this;
     }
 
@@ -208,6 +210,7 @@ class Action
             'disabled' => $isDisabled,
             'confirm' => $this->requiresConfirmation ? [
                 'message' => $this->confirmationMessage,
+                'title' => $this->confirmationTitle,
             ] : null,
             'meta' => $this->meta,
         ];

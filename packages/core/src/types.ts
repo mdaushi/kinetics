@@ -8,7 +8,7 @@ export interface TableColumn {
   filterable: boolean;
   filterOptions: string[] | Record<string, string>;
   visible: boolean;
-  type: TableColumnType
+  type: TableColumnType;
   meta: Record<string, unknown>;
 }
 
@@ -40,6 +40,7 @@ export interface TableProps<TData = Record<string, unknown>> {
 
 // Action types — mirror of Action::resolve() in Laravel
 export interface TableActionConfirm {
+  title: string;
   message: string;
 }
 
