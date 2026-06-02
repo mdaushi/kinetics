@@ -19,6 +19,7 @@ import {
 import { ActionCell } from "../components/action-cell";
 import { TableColumnHeader } from "../components/table-column-header";
 import { Badge } from "../components/ui/badge";
+import { cleanQueryParams } from "../lib/utils";
 
 export type { TableProps, TableColumn, TableMeta, TableState };
 
@@ -45,7 +46,9 @@ export function useTable<TData extends Record<string, unknown>>({
 
   const visit = useCallback(
     (params: Record<string, unknown>) => {
-      router.get(url ?? window.location.pathname, params as any, {
+      const cleanParams = cleanQueryParams(params, meta.per_page);
+
+      router.get(url ?? window.location.pathname, cleanParams, {
         preserveState: true,
         preserveScroll: true,
         replace: true,
