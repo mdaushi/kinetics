@@ -90,6 +90,11 @@ export function useTable<TData extends Record<string, unknown>>({
     [ctrl, visit],
   );
 
+  const handleReset = useCallback(() => {
+    setSearchLocal("");
+    visit(ctrl.resolveReset());
+  }, [ctrl, visit]);
+
   // Build TanStack column defs from server column definitions
 
   const columnDefs = useMemo<ColumnDef<TData>[]>(() => {
@@ -182,5 +187,6 @@ export function useTable<TData extends Record<string, unknown>>({
     },
     setFilter: handleFilterChange,
     filters: serverState.filters,
+    reset: handleReset,
   };
 }

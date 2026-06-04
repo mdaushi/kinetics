@@ -90,6 +90,19 @@ export class TableController {
     };
   }
 
+  // Reset
+
+  resolveReset(): Record<string, unknown> {
+    return {
+      sort: this.state.sort,
+      direction: this.state.direction,
+      per_page: this.state.per_page,
+      search: null,
+      filters: {},
+      page: 1,
+    };
+  }
+
   // Pagination
 
   resolvePageParams(

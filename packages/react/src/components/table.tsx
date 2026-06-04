@@ -21,6 +21,7 @@ export function Table<TData extends Record<string, unknown>>({
     setSearch,
     setFilter,
     filters,
+    reset,
   } = useTable({ table: serverData });
 
   return (
@@ -32,6 +33,7 @@ export function Table<TData extends Record<string, unknown>>({
         columns={serverColumns}
         filters={filters}
         setFilter={setFilter}
+        reset={reset}
       />
       <RenderTable table={tableInstance} />
 

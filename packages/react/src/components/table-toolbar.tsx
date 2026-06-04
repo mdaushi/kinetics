@@ -18,6 +18,7 @@ interface TableToolbarProps {
   placeholder: string;
   filters: Record<string, unknown>;
   setFilter: (key: string, value: unknown) => void;
+  reset: () => void;
 }
 export default function TableToolbar({
   search,
@@ -26,6 +27,7 @@ export default function TableToolbar({
   placeholder,
   filters,
   setFilter,
+  reset,
 }: TableToolbarProps) {
   const filterableColumns = columns.filter((c) => c.filterable);
 
@@ -74,7 +76,7 @@ export default function TableToolbar({
         })}
 
         {hasFilter && (
-          <Button variant="ghost">
+          <Button variant="ghost" onClick={reset}>
             Reset
             <X />
           </Button>
