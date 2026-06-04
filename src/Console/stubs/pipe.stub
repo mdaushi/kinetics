@@ -1,0 +1,24 @@
+<?php
+
+namespace {{ namespace }};
+
+use Closure;
+use Kinetics\Contracts\PipeInterface;
+use Kinetics\Support\TableContext;
+use Illuminate\Database\Eloquent\Builder;
+
+class {{ class }} implements PipeInterface
+{
+    public function handle(Builder $query, Closure $next): mixed
+    {
+        $ctx = $query->getModel()->datatableContext ?? null;
+
+        if (! $ctx instanceof TableContext) {
+            return $next($query);
+        }
+
+        // TODO: Implement your custom pipe logic here.
+
+        return $next($query);
+    }
+}

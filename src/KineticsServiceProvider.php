@@ -3,6 +3,7 @@
 namespace Kinetics;
 
 use Illuminate\Support\ServiceProvider;
+use Kinetics\Console\Commands\MakePipe;
 
 class KineticsServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,10 @@ class KineticsServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__ . '/../config/kinetics.php' => config_path('kinetics.php'),
             ], 'kinetics-config');
+
+            $this->commands([
+                MakePipe::class,
+            ]);
         }
     }
 }
