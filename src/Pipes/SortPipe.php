@@ -5,9 +5,9 @@ namespace Kinetics\Pipes;
 use Closure;
 use Kinetics\Columns\Column;
 use Kinetics\Contracts\PipeInterface;
+use Kinetics\Pipes\Concerns\JoinsRelations;
 use Kinetics\Support\TableContext;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Handles all sorting — both local columns and relation columns.
@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class SortPipe implements PipeInterface
 {
+    use JoinsRelations;
+
     public function handle(Builder $query, Closure $next): mixed
     {
         $ctx = $query->getModel()->datatableContext ?? null;
@@ -48,7 +50,11 @@ class SortPipe implements PipeInterface
 
         // Relation column — resolve via BelongsTo JOIN
         if ($columnDef->getRelation()) {
-            $this->applyRelationSort($query, $columnDef, $sortDirection);
+            if ($this->joinRelationIfNeeded($query, $columnDef)) {
+                $relationInstance = $query->getModel()->{$columnDef->getRelation()}();
+                $relatedTable = $relationInstance->getRelated()->getTable();
+                $query->orderBy("{$relatedTable}.{$columnDef->getRelationKey()}", $sortDirection);
+            }
             return $next($query);
         }
 
@@ -56,53 +62,5 @@ class SortPipe implements PipeInterface
         $query->orderBy($sortColumn, $sortDirection);
 
         return $next($query);
-    }
-
-    /**
-     * Apply a LEFT JOIN and ORDER BY for a BelongsTo relation column.
-     *
-     * Only BelongsTo is supported because we need getForeignKeyName()
-     * and getOwnerKeyName() to build the JOIN condition.
-     */
-    private function applyRelationSort(Builder $query, Column $column, string $direction): void
-    {
-        $relation = $column->getRelation();
-        $relationKey = $column->getRelationKey();
-        $model = $query->getModel();
-
-        if (! method_exists($model, $relation)) {
-            return;
-        }
-
-        $relationInstance = $model->{$relation}();
-
-        // Only BelongsTo supports getForeignKeyName() / getOwnerKeyName()
-        if (! $relationInstance instanceof BelongsTo) {
-            return;
-        }
-
-        $relatedTable = $relationInstance->getRelated()->getTable();
-        $foreignKey = $relationInstance->getForeignKeyName();
-        $ownerKey = $relationInstance->getOwnerKeyName();
-        $localTable = $model->getTable();
-
-        // Only JOIN if not already joined (idempotent)
-        $alreadyJoined = collect($query->getQuery()->joins ?? [])
-            ->pluck('table')
-            ->contains($relatedTable);
-
-        if (! $alreadyJoined) {
-            $query->leftJoin(
-                $relatedTable,
-                "{$localTable}.{$foreignKey}",
-                '=',
-                "{$relatedTable}.{$ownerKey}"
-            );
-        }
-
-        // Qualify the main table to avoid ambiguous column errors after JOIN
-        $query->select("{$localTable}.*");
-
-        $query->orderBy("{$relatedTable}.{$relationKey}", $direction);
     }
 }

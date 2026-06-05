@@ -150,7 +150,7 @@ export function useTable<TData extends Record<string, unknown>>({
               );
             }
 
-            const formatted = String(value ?? "—");
+            const formatted = value ? String(value) : null;
 
             return formatted;
           },
