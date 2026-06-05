@@ -7,6 +7,7 @@ use Kinetics\Contracts\ColumnInterface;
 abstract class Column implements ColumnInterface
 {
     protected string $key;
+    protected string $outputKey;
     protected string $label;
     protected bool $sortable = false;
     protected bool $searchable = false;
@@ -22,6 +23,7 @@ abstract class Column implements ColumnInterface
     protected function __construct(string $key)
     {
         $this->key = $key;
+        $this->outputKey = $key;
         $this->label = str($key)->replace('_', ' ')->title()->toString();
     }
 
@@ -37,6 +39,21 @@ abstract class Column implements ColumnInterface
     public function label(string $label): static
     {
         $this->label = $label;
+        return $this;
+    }
+
+    /**
+     * Set an alias for the output key in the row data.
+     * Use this when two columns read from the same source field
+     * to avoid the second overwriting the first.
+     *
+     * Example:
+     *   TextColumn::make('created_at')->date('d/m/Y'),
+     *   TextColumn::make('created_at')->as('created_at_formatted')->formatUsing(fn($v) => ...),
+     */
+    public function as(string $outputKey): static
+    {
+        $this->outputKey = $outputKey;
         return $this;
     }
 
@@ -111,7 +128,18 @@ abstract class Column implements ColumnInterface
 
     // Getters
 
+    /**
+     * The output key used in row data (may differ from the source DB field).
+     */
     public function getKey(): string
+    {
+        return $this->outputKey;
+    }
+
+    /**
+     * The source field name from the DB / model.
+     */
+    public function getSourceKey(): string
     {
         return $this->key;
     }
@@ -143,7 +171,7 @@ abstract class Column implements ColumnInterface
     public function toArray(): array
     {
         return [
-            'key' => $this->key,
+            'key' => $this->outputKey,
             'label' => $this->label,
             'sortable' => $this->sortable,
             'searchable' => $this->searchable,

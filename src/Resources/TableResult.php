@@ -114,27 +114,31 @@ class TableResult implements \JsonSerializable
 
     private function transformData(): array
     {
-        $formatters = collect($this->columns)
+        $formatterColumns = collect($this->columns)
             ->filter(fn(Column $c) => ! ($c instanceof ActionColumn) && $c->getFormatter() !== null)
-            ->keyBy(fn(Column $c) => $c->getKey())
-            ->toArray();
+            ->values();
 
         /** @var ActionColumn[] $actionColumns */
         $actionColumns = collect($this->columns)
             ->filter(fn(Column $c) => $c instanceof ActionColumn && $c->hasActions())
+            ->values()
             ->toArray();
 
         return collect($this->paginator->items())
-            ->map(function ($item) use ($formatters, $actionColumns) {
+            ->map(function ($item) use ($formatterColumns, $actionColumns) {
                 $row = $item instanceof \Illuminate\Database\Eloquent\Model
                     ? $item->toArray()
                     : (array) $item;
 
-                // Apply value formatters
-                foreach ($formatters as $key => $column) {
-                    if (array_key_exists($key, $row)) {
-                        $row[$key] = ($column->getFormatter())($row[$key], $row, $item);
+                foreach ($formatterColumns as $column) {
+                    $sourceKey = $column->getSourceKey();
+                    $outputKey = $column->getKey();
+
+                    if (! array_key_exists($sourceKey, $row)) {
+                        continue;
                     }
+
+                    $row[$outputKey] = ($column->getFormatter())($row[$sourceKey], $row, $item);
                 }
 
                 // Resolve actions per-row dan inject ke dalam data
