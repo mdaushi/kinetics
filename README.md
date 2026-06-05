@@ -72,8 +72,10 @@ export default {
 
 ## Documentation
 
-- [Backend (Laravel)](./docs/laravel-backend.md)
-- [Frontend (React)](./docs/react-frontend.md)
+- [Backend (Laravel)](./docs/laravel-backend.md) — Installation, columns, actions, pipes, complete API reference
+- [Frontend (React)](./docs/react-frontend.md) — <Table> component and useTable hook
+- [Custom Pipes](./docs/custom-pipes.md) — A guide to creating custom pipes + built-in pipe reference
+- [Architecture](./docs/architecture.md) — Internal design: pipelines, contexts, response builders
 
 ---
 
