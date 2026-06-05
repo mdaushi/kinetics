@@ -118,6 +118,12 @@ class TableResult implements \JsonSerializable
             ->filter(fn(Column $c) => ! ($c instanceof ActionColumn) && $c->getFormatter() !== null)
             ->values();
 
+        /** @var Column[] $relationColumns */
+        $relationColumns = collect($this->columns)
+            ->filter(fn(Column $c) => ! ($c instanceof ActionColumn) && $c->getRelation() !== null)
+            ->values()
+            ->toArray();
+
         /** @var ActionColumn[] $actionColumns */
         $actionColumns = collect($this->columns)
             ->filter(fn(Column $c) => $c instanceof ActionColumn && $c->hasActions())
@@ -125,10 +131,26 @@ class TableResult implements \JsonSerializable
             ->toArray();
 
         return collect($this->paginator->items())
-            ->map(function ($item) use ($formatterColumns, $actionColumns) {
+            ->map(function ($item) use ($formatterColumns, $relationColumns, $actionColumns) {
                 $row = $item instanceof \Illuminate\Database\Eloquent\Model
                     ? $item->toArray()
                     : (array) $item;
+
+                if ($item instanceof \Illuminate\Database\Eloquent\Model) {
+                    foreach ($relationColumns as $column) {
+                        $relationName = $column->getRelation();
+                        $relationKey = $column->getRelationKey();
+                        $outputKey = $column->getKey();
+
+                        if (! $item->relationLoaded($relationName)) {
+                            $row[$outputKey] = null;
+                            continue;
+                        }
+
+                        $related = $item->getRelation($relationName);
+                        $row[$outputKey] = $related ? data_get($related, $relationKey) : null;
+                    }
+                }
 
                 foreach ($formatterColumns as $column) {
                     $sourceKey = $column->getSourceKey();

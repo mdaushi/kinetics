@@ -64,6 +64,22 @@ class TableContext
             ->toArray();
     }
 
+    /**
+     * Unique relation names needed by relation columns.
+     * Used by PaginatePipe to eager-load in a single batch query per relation.
+     *
+     * @return string[]
+     */
+    public function getRelationNames(): array
+    {
+        return collect($this->columns)
+            ->filter(fn(Column $c) => $c->getRelation() !== null)
+            ->map(fn(Column $c) => $c->getRelation())
+            ->unique()
+            ->values()
+            ->toArray();
+    }
+
     // Request helpers
 
     public function getSortColumn(): ?string

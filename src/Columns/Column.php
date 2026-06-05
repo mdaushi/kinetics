@@ -22,9 +22,16 @@ abstract class Column implements ColumnInterface
 
     protected function __construct(string $key)
     {
-        $this->key = $key;
-        $this->outputKey = $key;
-        $this->label = str($key)->replace('_', ' ')->title()->toString();
+        // Auto-parse dot notation: 'user.name' -> relation='user', relationKey='name', outputKey='user_name'
+        if (str_contains($key, '.')) {
+            [$this->relation, $this->relationKey] = explode('.', $key, 2);
+            $this->outputKey = str_replace('.', '_', $key);
+        } else {
+            $this->outputKey = $key;
+        }
+
+        $this->key   = $key;
+        $this->label = str(str_replace('.', '_', $key))->replace('_', ' ')->title()->toString();
     }
 
     // Static constructor
@@ -100,17 +107,19 @@ abstract class Column implements ColumnInterface
     }
 
     /**
-     * For relationship columns.
+     * Explicitly override the relation and field for this column.
      *
-     * Example:
-     *   Column::make('department_name')
-     *       ->relation('department', 'name')
-     *       ->sortable()
+     * Prefer dot-notation in make() for the common case:
+     *   TextColumn::make('user.name')       // auto: relation=user, key=name, output=user_name
+     *
+     * Use ->relation() only when the output key needs to differ from the relation path:
+     *   TextColumn::make('author_name')     // custom output key
+     *       ->relation('user', 'name')      // explicit relation override
      */
-    public function relation(string $relation, string $foreignKey): static
+    public function relation(string $relation, string $relationKey): static
     {
         $this->relation = $relation;
-        $this->relationKey = $foreignKey;
+        $this->relationKey = $relationKey;
         return $this;
     }
 
@@ -137,32 +146,42 @@ abstract class Column implements ColumnInterface
     }
 
     /**
-     * The source field name from the DB / model.
+     * The source field name from the DB / model attribute.
      */
     public function getSourceKey(): string
     {
+        if ($this->relation !== null) {
+            return $this->outputKey;
+        }
+
         return $this->key;
     }
+
     public function getRelation(): ?string
     {
         return $this->relation;
     }
+
     public function getRelationKey(): ?string
     {
         return $this->relationKey;
     }
+
     public function isSearchable(): bool
     {
         return $this->searchable;
     }
+
     public function isSortable(): bool
     {
         return $this->sortable;
     }
+
     public function isFilterable(): bool
     {
         return $this->filterable;
     }
+
     public function getFormatter(): ?\Closure
     {
         return $this->formatUsing;

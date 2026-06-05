@@ -22,8 +22,18 @@ class PaginatePipe implements PipeInterface
             ? $ctx->getPerPage()
             : 15;
 
-        return $query
+        $paginator = $query
             ->paginate($perPage)
             ->withQueryString();
+
+        if ($ctx instanceof TableContext) {
+            $relations = $ctx->getRelationNames();
+
+            if (! empty($relations)) {
+                $paginator->getCollection()->loadMissing($relations);
+            }
+        }
+
+        return $paginator;
     }
 }
