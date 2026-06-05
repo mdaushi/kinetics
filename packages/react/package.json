@@ -1,8 +1,15 @@
 {
   "name": "@mdaushi/kinetics-react",
-  "version": "0.1.0-a",
+  "version": "0.1.0",
   "description": "React components for Kinetics — Zero-Friction Tables for Inertia.js",
-  "keywords": ["react", "inertia", "laravel", "datatable", "tanstack-table", "kinetics"],
+  "keywords": [
+    "react",
+    "inertia",
+    "laravel",
+    "datatable",
+    "tanstack-table",
+    "kinetics"
+  ],
   "homepage": "https://github.com/mdaushi/kinetics",
   "repository": {
     "type": "git",
