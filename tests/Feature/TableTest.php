@@ -4,9 +4,10 @@ namespace Kinetics\Tests\Feature;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
-use Kinetics\Columns\Column;
+use Kinetics\Columns\TextColumn;
 use Kinetics\Exceptions\InvalidPipeException;
 use Kinetics\Pipes\SearchPipe;
 use Kinetics\Table;
@@ -18,17 +19,27 @@ class TableTest extends TestCase
     {
         parent::setUp();
 
+        Schema::create('categories', function ($table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
+        });
+
         Schema::create('users', function ($table) {
             $table->id();
             $table->string('name');
             $table->string('email');
             $table->string('role');
+            $table->foreignId('category_id')->nullable()->constrained('categories');
             $table->timestamps();
         });
 
-        TestUser::create(['name' => 'fulan', 'email' => 'fulan@example.com', 'role' => 'admin']);
-        TestUser::create(['name' => 'Ucok', 'email' => 'ucok@example.com', 'role' => 'admin']);
-        TestUser::create(['name' => 'Om Bob', 'email' => 'bob@example.com', 'role' => 'user']);
+        $catA = TestCategory::create(['name' => 'Engineering']);
+        $catB = TestCategory::create(['name' => 'Marketing']);
+
+        TestUser::create(['name' => 'fulan',  'email' => 'fulan@example.com', 'role' => 'admin',  'category_id' => $catA->id]);
+        TestUser::create(['name' => 'Ucok',   'email' => 'ucok@example.com',  'role' => 'admin',  'category_id' => $catB->id]);
+        TestUser::create(['name' => 'Om Bob', 'email' => 'bob@example.com',   'role' => 'user',   'category_id' => $catA->id]);
     }
 
     // Output shape
@@ -37,8 +48,8 @@ class TableTest extends TestCase
     {
         $result = Table::model(TestUser::class)
             ->columns([
-                Column::make('name')->sortable()->searchable(),
-                Column::make('email')->sortable(),
+                TextColumn::make('name')->sortable()->searchable(),
+                TextColumn::make('email')->sortable(),
             ])
             ->withRequest(new Request())
             ->make();
@@ -52,7 +63,7 @@ class TableTest extends TestCase
     public function test_data_contains_all_records_by_default(): void
     {
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')])
+            ->columns([TextColumn::make('name')])
             ->withRequest(new Request())
             ->make();
 
@@ -63,7 +74,7 @@ class TableTest extends TestCase
     {
         $result = Table::model(TestUser::class)
             ->columns([
-                Column::make('name')->sortable()->searchable(),
+                TextColumn::make('name')->sortable()->searchable(),
             ])
             ->withRequest(new Request())
             ->make();
@@ -83,7 +94,7 @@ class TableTest extends TestCase
         $request = new Request(['sort' => 'name', 'direction' => 'asc']);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')->sortable()])
+            ->columns([TextColumn::make('name')->sortable()])
             ->withRequest($request)
             ->make();
 
@@ -96,7 +107,7 @@ class TableTest extends TestCase
         $request = new Request(['sort' => 'name', 'direction' => 'desc']);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')->sortable()])
+            ->columns([TextColumn::make('name')->sortable()])
             ->withRequest($request)
             ->make();
 
@@ -111,8 +122,8 @@ class TableTest extends TestCase
 
         $result = Table::model(TestUser::class)
             ->columns([
-                Column::make('name')->sortable(),
-                Column::make('email'), // tidak sortable
+                TextColumn::make('name')->sortable(),
+                TextColumn::make('email'), // tidak sortable
             ])
             ->withRequest($request)
             ->make();
@@ -129,8 +140,8 @@ class TableTest extends TestCase
 
         $result = Table::model(TestUser::class)
             ->columns([
-                Column::make('name')->searchable(),
-                Column::make('email')->searchable(),
+                TextColumn::make('name')->searchable(),
+                TextColumn::make('email')->searchable(),
             ])
             ->withRequest($request)
             ->make();
@@ -144,7 +155,7 @@ class TableTest extends TestCase
         $request = new Request(['search' => 'a']); // 1 karakter
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')->searchable()])
+            ->columns([TextColumn::make('name')->searchable()])
             ->withRequest($request)
             ->make();
 
@@ -156,7 +167,7 @@ class TableTest extends TestCase
         $request = new Request(['search' => 'FULAN']);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')->searchable()])
+            ->columns([TextColumn::make('name')->searchable()])
             ->withRequest($request)
             ->make();
 
@@ -170,7 +181,7 @@ class TableTest extends TestCase
         $request = new Request(['filters' => ['role' => 'admin']]);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('role')->filterable(['admin', 'user'])])
+            ->columns([TextColumn::make('role')->filterable(['admin', 'user'])])
             ->withRequest($request)
             ->make();
 
@@ -186,7 +197,7 @@ class TableTest extends TestCase
         $request = new Request(['filters' => ['name' => 'fulan']]);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')]) // no ->filterable()
+            ->columns([TextColumn::make('name')]) // no ->filterable()
             ->withRequest($request)
             ->make();
 
@@ -199,7 +210,7 @@ class TableTest extends TestCase
     public function test_pagination_meta_is_correct(): void
     {
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')])
+            ->columns([TextColumn::make('name')])
             ->perPage(2)
             ->withRequest(new Request(['page' => 1]))
             ->make();
@@ -216,7 +227,7 @@ class TableTest extends TestCase
         $request = new Request(['per_page' => 999]);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')])
+            ->columns([TextColumn::make('name')])
             ->perPage(15, 50) // max 50
             ->withRequest($request)
             ->make();
@@ -237,7 +248,7 @@ class TableTest extends TestCase
         };
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')])
+            ->columns([TextColumn::make('name')])
             ->pipes([$adminOnlyPipe])
             ->withRequest(new Request())
             ->make();
@@ -250,7 +261,7 @@ class TableTest extends TestCase
         $request = new Request(['search' => 'alice']);
 
         $result = Table::model(TestUser::class)
-            ->columns([Column::make('name')->searchable()])
+            ->columns([TextColumn::make('name')->searchable()])
             ->withoutPipes([SearchPipe::class])
             ->withRequest($request)
             ->make();
@@ -264,7 +275,7 @@ class TableTest extends TestCase
         $this->expectException(InvalidPipeException::class);
 
         Table::model(TestUser::class)
-            ->columns([Column::make('name')])
+            ->columns([TextColumn::make('name')])
             ->pipes([\stdClass::class]); // bukan PipeInterface
     }
 
@@ -274,7 +285,7 @@ class TableTest extends TestCase
     {
         $result = Table::model(TestUser::class)
             ->columns([
-                Column::make('role')
+                TextColumn::make('role')
                     ->formatUsing(fn($val) => strtoupper($val)),
             ])
             ->withRequest(new Request())
@@ -298,8 +309,8 @@ class TableTest extends TestCase
 
         $result = Table::model(TestUser::class)
             ->columns([
-                Column::make('name')->sortable()->searchable(),
-                Column::make('role')->filterable(),
+                TextColumn::make('name')->sortable()->searchable(),
+                TextColumn::make('role')->filterable(),
             ])
             ->withRequest($request)
             ->make();
@@ -310,10 +321,127 @@ class TableTest extends TestCase
         $this->assertEquals('ali',   $state['search']);
         $this->assertEquals(['role' => 'admin'], $state['filters']);
     }
+
+    // Relation — dot notation
+
+    public function test_dot_notation_auto_sets_relation_and_output_key(): void
+    {
+        // 'category.name' → relation='category', outputKey='category_name'
+        $result = Table::model(TestUser::class)
+            ->columns([
+                TextColumn::make('name'),
+                TextColumn::make('category.name'),
+            ])
+            ->withRequest(new Request())
+            ->make();
+
+        $this->assertCount(3, $result['data']);
+
+        foreach ($result['data'] as $row) {
+            // Output key harus 'category_name' (titik → underscore), bukan 'category.name'
+            $this->assertArrayHasKey('category_name', $row);
+            $this->assertArrayNotHasKey('category.name', $row);
+            $this->assertNotNull($row['category_name']);
+        }
+    }
+
+    public function test_dot_notation_auto_derives_label(): void
+    {
+        $result = Table::model(TestUser::class)
+            ->columns([
+                TextColumn::make('category.name'),
+            ])
+            ->withRequest(new Request())
+            ->make();
+
+        // Label harus 'Category Name', bukan 'Category.name'
+        $this->assertEquals('Category Name', $result['columns'][0]['label']);
+    }
+
+    public function test_dot_notation_search_uses_whereHas(): void
+    {
+        $request = new Request(['search' => 'Engineering']);
+
+        $result = Table::model(TestUser::class)
+            ->columns([
+                TextColumn::make('name'),
+                TextColumn::make('category.name')->searchable(),
+            ])
+            ->withRequest($request)
+            ->make();
+
+        // fulan dan Om Bob ada di Engineering
+        $this->assertCount(2, $result['data']);
+    }
+
+    public function test_dot_notation_sort_joins_related_table(): void
+    {
+        // Sort ascending: Engineering < Marketing
+        $request = new Request(['sort' => 'category_name', 'direction' => 'asc']);
+
+        $result = Table::model(TestUser::class)
+            ->columns([
+                TextColumn::make('name'),
+                TextColumn::make('category.name')->sortable(),
+            ])
+            ->withRequest($request)
+            ->make();
+
+        $categories = array_column($result['data'], 'category_name');
+        $this->assertEquals('Engineering', $categories[0]);
+        $this->assertEquals('Engineering', $categories[1]);
+        $this->assertEquals('Marketing',   $categories[2]);
+    }
+
+    public function test_dot_notation_formatter_chains_correctly(): void
+    {
+        // Formatter harus bisa di-chain setelah nilai relasi di-inject
+        $result = Table::model(TestUser::class)
+            ->columns([
+                TextColumn::make('category.name')
+                    ->formatUsing(fn($val) => strtoupper((string) $val)),
+            ])
+            ->withRequest(new Request())
+            ->make();
+
+        foreach ($result['data'] as $row) {
+            $this->assertMatchesRegularExpression('/^[A-Z]+$/', $row['category_name']);
+        }
+    }
+
+    public function test_explicit_relation_method_still_works(): void
+    {
+        // Backward compat: ->relation() tetap bekerja untuk kasus dengan custom output key
+        $result = Table::model(TestUser::class)
+            ->columns([
+                TextColumn::make('name'),
+                TextColumn::make('group')          // custom output key
+                    ->relation('category', 'name'), // explicit override
+            ])
+            ->withRequest(new Request())
+            ->make();
+
+        $this->assertCount(3, $result['data']);
+        foreach ($result['data'] as $row) {
+            $this->assertArrayHasKey('group', $row);
+            $this->assertNotNull($row['group']);
+        }
+    }
+}
+
+class TestCategory extends Model
+{
+    protected $table = 'categories';
+    protected $fillable = ['name'];
 }
 
 class TestUser extends Model
 {
     protected $table = 'users';
-    protected $fillable = ['name', 'email', 'role'];
+    protected $fillable = ['name', 'email', 'role', 'category_id'];
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(TestCategory::class);
+    }
 }
