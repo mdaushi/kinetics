@@ -36,18 +36,18 @@ class ActionColumn extends Column
     /** @var array<Action|ActionGroup> */
     private array $actionDefinitions = [];
 
-    private string $columnKey = '__actions';
+    private string $columnKey;
 
-    private function __construct()
+    private function __construct(string $key)
     {
-        parent::__construct($this->columnKey);
+        parent::__construct($key);
         $this->label('Actions');
         $this->type = 'actions';
     }
 
     public static function make(string $key = '__actions'): static
     {
-        $instance             = new static();
+        $instance = new static($key);
         $instance->columnKey  = $key;
         return $instance;
     }
