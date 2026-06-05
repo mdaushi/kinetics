@@ -5,8 +5,13 @@
     "keywords": [
         "laravel",
         "inertia",
+        "inertiajs",
+        "react",
         "datatable",
-        "server-side"
+        "data-table",
+        "server-side",
+        "tanstack-table",
+        "shadcn"
     ],
     "require": {
         "php": "^8.2",

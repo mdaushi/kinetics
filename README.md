@@ -1,8 +1,13 @@
 # Kinetics
 
-**Zero-Friction Tables for Inertia.js.**
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/mdaushi/kinetics.svg?style=flat-square)](https://packagist.org/packages/mdaushi/kinetics)
+[![npm version](https://img.shields.io/npm/v/@mdaushi/kinetics-react.svg?style=flat-square)](https://www.npmjs.com/package/@mdaushi/kinetics-react)
+[![Tests](https://img.shields.io/github/actions/workflow/status/mdaushi/kinetics/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/mdaushi/kinetics/actions/workflows/tests.yml)
+[![License](https://img.shields.io/packagist/l/mdaushi/kinetics.svg?style=flat-square)](https://packagist.org/packages/mdaushi/kinetics)
 
-Kinetics is the table layer for Laravel + Inertia.js. Everything — sorting, filtering, searching, pagination — runs server-side through a clean and composable query pipeline.
+**Zero-Friction Server-Side Datatables for Laravel, Inertia.js, and React.**
+
+Kinetics is the ultimate table layer for your Laravel + Inertia.js stack. Everything — sorting, filtering, searching, and pagination — runs seamlessly server-side through a clean and composable Eloquent query pipeline.
 
 Building a table in an Inertia.js app usually means wiring up query parameters, managing state, and keeping the UI in sync with the server — all by hand. Kinetics eliminates that friction. Define your columns and actions on the backend, drop a single component into your page, and get a fully functional, reactive table with zero boilerplate.
 

@@ -5,9 +5,13 @@
   "keywords": [
     "react",
     "inertia",
+    "inertiajs",
     "laravel",
     "datatable",
+    "data-table",
+    "datagrid",
     "tanstack-table",
+    "shadcn-ui",
     "kinetics"
   ],
   "homepage": "https://github.com/mdaushi/kinetics",
