@@ -1,12 +1,23 @@
 // Types — mirror of TableResult::toArray() in Laravel
 
+export interface TableFilterOption {
+  value: string | number;
+  label: string;
+}
+
+export interface TableFilter {
+  name: string;
+  label: string;
+  type: "text" | "select" | string;
+  operators?: TableFilterOption[];
+  options?: TableFilterOption[];
+}
+
 export interface TableColumn {
   key: string;
   label: string;
   sortable: boolean;
   searchable: boolean;
-  filterable: boolean;
-  filterOptions: string[] | Record<string, string>;
   visible: boolean;
   type: TableColumnType;
   meta: Record<string, unknown>;
@@ -34,6 +45,7 @@ export interface TableState {
 export interface TableProps<TData = Record<string, unknown>> {
   data: TData[];
   columns: TableColumn[];
+  filters?: TableFilter[];
   meta: TableMeta;
   state: TableState;
 }

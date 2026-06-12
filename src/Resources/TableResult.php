@@ -33,6 +33,7 @@ class TableResult implements \JsonSerializable
         return [
             'data' => $this->getData(),
             'columns' => $this->getColumns(),
+            'filters' => $this->context->getFiltersArray(),
             'meta' => $this->getMeta(),
             'state' => $this->getState(),
         ];

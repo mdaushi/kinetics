@@ -34,7 +34,13 @@ export function useTable<TData extends Record<string, unknown>>({
   url,
   searchDebounce = 300,
 }: UseTableOptions<TData>) {
-  const { data, columns: serverColumns, meta, state: serverState } = serverData;
+  const {
+    data,
+    columns: serverColumns,
+    meta,
+    state: serverState,
+    filters: serverFilters = [],
+  } = serverData;
 
   // Controller from core — all logic parameters are here
   const ctrl = useMemo(
@@ -124,7 +130,6 @@ export function useTable<TData extends Record<string, unknown>>({
               title: col.label,
             } as any),
           enableSorting: col.sortable,
-          enableColumnFilter: col.filterable,
           cell: ({ getValue }) => {
             const value = getValue();
             if (col.type === "badge") {
@@ -187,6 +192,7 @@ export function useTable<TData extends Record<string, unknown>>({
     },
     setFilter: handleFilterChange,
     filters: serverState.filters,
+    filtersConfig: serverFilters,
     reset: handleReset,
   };
 }

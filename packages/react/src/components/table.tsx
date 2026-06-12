@@ -1,4 +1,3 @@
-import React from "react";
 import { TableProps, useTable } from "../hooks/use-table";
 import TablePagination from "./table-pagination";
 import TableToolbar from "./table-toolbar";
@@ -21,6 +20,7 @@ export function Table<TData extends Record<string, unknown>>({
     setSearch,
     setFilter,
     filters,
+    filtersConfig,
     reset,
   } = useTable({ table: serverData });
 
@@ -32,6 +32,7 @@ export function Table<TData extends Record<string, unknown>>({
         placeholder={searchPlaceholder}
         columns={serverColumns}
         filters={filters}
+        filtersConfig={filtersConfig}
         setFilter={setFilter}
         reset={reset}
       />

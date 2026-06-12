@@ -11,11 +11,9 @@ abstract class Column implements ColumnInterface
     protected string $label;
     protected bool $sortable = false;
     protected bool $searchable = false;
-    protected bool $filterable = false;
     protected bool $visible = true;
     protected ?string $type = 'text';
     protected array $meta = [];
-    protected array $filterOptions = [];
     protected ?string $relation = null;
     protected ?string $relationKey = null;
     protected ?\Closure $formatUsing = null;
@@ -76,19 +74,7 @@ abstract class Column implements ColumnInterface
         return $this;
     }
 
-    /**
-     * Mark column as filterable with optional predefined options.
-     *
-     * Example:
-     *   Column::make('status')->filterable(['active', 'inactive'])
-     *   Column::make('role')->filterable(['admin' => 'Administrator', 'user' => 'Regular User'])
-     */
-    public function filterable(array $options = [], bool $value = true): static
-    {
-        $this->filterable = $value;
-        $this->filterOptions = $options;
-        return $this;
-    }
+
 
     public function hidden(bool $value = true): static
     {
@@ -177,11 +163,6 @@ abstract class Column implements ColumnInterface
         return $this->sortable;
     }
 
-    public function isFilterable(): bool
-    {
-        return $this->filterable;
-    }
-
     public function getFormatter(): ?\Closure
     {
         return $this->formatUsing;
@@ -194,8 +175,6 @@ abstract class Column implements ColumnInterface
             'label' => $this->label,
             'sortable' => $this->sortable,
             'searchable' => $this->searchable,
-            'filterable' => $this->filterable,
-            'filterOptions' => $this->filterOptions,
             'visible' => $this->visible,
             'type' => $this->type,
             'meta' => $this->meta,

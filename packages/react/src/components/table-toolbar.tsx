@@ -1,15 +1,10 @@
-import { TableColumn } from "@mdaushi/kinetics-core";
+import * as React from "react";
+import { TableColumn, TableFilter } from "@mdaushi/kinetics-core";
 import { X } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
-import { Button } from "./ui/button";
+
 import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+import { AddFilterDropdown, ActiveFilterPills } from "./table-filters";
 
 interface TableToolbarProps {
   search: string;
@@ -17,6 +12,7 @@ interface TableToolbarProps {
   setSearch: (val: string) => void;
   placeholder: string;
   filters: Record<string, unknown>;
+  filtersConfig: TableFilter[];
   setFilter: (key: string, value: unknown) => void;
   reset: () => void;
 }
@@ -26,62 +22,64 @@ export default function TableToolbar({
   setSearch,
   placeholder,
   filters,
+  filtersConfig,
   setFilter,
   reset,
 }: TableToolbarProps) {
-  const filterableColumns = columns.filter((c) => c.filterable);
+  const [draftFilters, setDraftFilters] = React.useState<string[]>([]);
 
   const hasSearch = columns.some((c) => c.searchable);
 
   const hasFilter = search || Object.keys(filters).length > 0;
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 items-center gap-2">
-        {hasSearch && (
-          <Input
-            placeholder={placeholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="h-8 w-37.5 lg:w-62.5"
+    <div className="flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex flex-1 items-center gap-2">
+          {hasSearch && (
+            <Input
+              placeholder={placeholder}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+          )}
+
+          <AddFilterDropdown
+            filters={filtersConfig}
+            activeFilters={filters}
+            draftFilters={draftFilters}
+            onAddDraft={(name) => setDraftFilters((prev) => [...prev, name])}
+            setFilter={setFilter}
           />
-        )}
 
-        {filterableColumns.map((col) => {
-          const options = Array.isArray(col.filterOptions)
-            ? Object.fromEntries(col.filterOptions.map((o) => [o, o]))
-            : col.filterOptions;
-
-          return (
-            <Select
-              items={options}
-              value={(filters[col.key] as string) ?? ""}
-              onValueChange={(e) => setFilter(col.key, e || null)}
+          {hasFilter && (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setDraftFilters([]);
+                reset();
+              }}
+              className="h-8 px-2 lg:px-3"
             >
-              <SelectTrigger>
-                <SelectValue placeholder={col.label} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="">All {col.label}</SelectItem>
-                  {Object.entries(options).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          );
-        })}
-
-        {hasFilter && (
-          <Button variant="ghost" onClick={reset}>
-            Reset
-            <X />
-          </Button>
-        )}
+              Reset
+              <X className="ml-2 h-4 w-4" />
+            </Button>
+          )}
+        </div>
       </div>
+
+      {(hasFilter || draftFilters.length > 0) && (
+        <ActiveFilterPills
+          filters={filtersConfig}
+          activeFilters={filters}
+          draftFilters={draftFilters}
+          onRemoveDraft={(name) =>
+            setDraftFilters((prev) => prev.filter((n) => n !== name))
+          }
+          setFilter={setFilter}
+        />
+      )}
     </div>
   );
 }

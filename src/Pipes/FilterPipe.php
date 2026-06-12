@@ -17,39 +17,20 @@ class FilterPipe implements PipeInterface
             return $next($query);
         }
 
-        $filters  = $ctx->getFilters();
-        $allowed  = $ctx->getFilterableKeys();
+        $requestFilters = $ctx->getFilters();
+        $filterObjects  = collect($ctx->getFilterObjects())->keyBy(fn($f) => $f->getKey());
 
-        foreach ($filters as $column => $value) {
-            // Hanya proses filter yang diizinkan
-            if (! in_array($column, $allowed)) {
+        foreach ($requestFilters as $column => $value) {
+            // Only filter processes are allowed (those registered in the Table)
+            if (! $filterObjects->has($column)) {
                 continue;
             }
 
-            if ($value === null || $value === '') {
-                continue;
-            }
-
-            // Array value -> whereIn
-            if (is_array($value)) {
-                $value = array_filter($value, fn($v) => $v !== null && $v !== '');
-                if (! empty($value)) {
-                    $query->whereIn($column, $value);
-                }
-                continue;
-            }
-
-            // Range filter: { from: '2024-01-01', to: '2024-12-31' }
-            if (is_array($value) && isset($value['from'], $value['to'])) {
-                $query->whereBetween($column, [$value['from'], $value['to']]);
-                continue;
-            }
-
-            // Default: exact match
-            $query->where($column, $value);
+            $filter = $filterObjects->get($column);
+            $filter->apply($query, $value);
         }
 
-        $ctx->setMeta('filters', $filters);
+        $ctx->setMeta('filters', $requestFilters);
 
         return $next($query);
     }

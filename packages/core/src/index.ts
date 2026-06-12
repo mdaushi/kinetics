@@ -7,6 +7,8 @@ export type {
   TableActionConfirm,
   TableActionGroup,
   ActionItem,
+  TableFilter,
+  TableFilterOption,
 } from "./types";
 
 export { TableController } from "./controller";

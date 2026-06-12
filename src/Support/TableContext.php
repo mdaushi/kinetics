@@ -18,6 +18,9 @@ class TableContext
     /** @var Column[] */
     private array $columns;
 
+    /** @var \Kinetics\Contracts\FilterInterface[] */
+    private array $filters;
+
     private array $meta = [];
 
     public function __construct(
@@ -25,8 +28,10 @@ class TableContext
         public readonly Request $request,
         public readonly TableConfig $config,
         array $columns,
+        array $filters = [],
     ) {
         $this->columns = $columns;
+        $this->filters = $filters;
     }
 
     // Column helpers
@@ -55,11 +60,24 @@ class TableContext
             ->toArray();
     }
 
+    /** @return \Kinetics\Contracts\FilterInterface[] */
+    public function getFilterObjects(): array
+    {
+        return $this->filters;
+    }
+
     public function getFilterableKeys(): array
     {
-        return collect($this->columns)
-            ->filter(fn(Column $c) => $c->isFilterable())
-            ->map(fn(Column $c) => $c->getKey())
+        return collect($this->filters)
+            ->map(fn($f) => $f->getKey())
+            ->values()
+            ->toArray();
+    }
+
+    public function getFiltersArray(): array
+    {
+        return collect($this->filters)
+            ->map(fn($f) => $f->toArray())
             ->values()
             ->toArray();
     }

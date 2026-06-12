@@ -26,6 +26,9 @@ class Table
     /** @var Column[] */
     private array $columns = [];
 
+    /** @var \Kinetics\Contracts\FilterInterface[] */
+    private array $filters = [];
+
     /** @var class-string<PipeInterface>[]|PipeInterface[] */
     private array $extraPipes   = [];
 
@@ -78,6 +81,17 @@ class Table
     public function columns(array $columns): static
     {
         $this->columns = $columns;
+        return $this;
+    }
+
+    /**
+     * Define filter definitions.
+     *
+     * @param \Kinetics\Contracts\FilterInterface[] $filters
+     */
+    public function filters(array $filters): static
+    {
+        $this->filters = $filters;
         return $this;
     }
 
@@ -235,6 +249,7 @@ class Table
             request: $this->request,
             config: $this->config,
             columns: $this->columns,
+            filters: $this->filters,
         );
 
         // Titipkan context ke model — diambil oleh pipes
