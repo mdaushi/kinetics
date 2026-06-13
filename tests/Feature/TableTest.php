@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Kinetics\Columns\TextColumn;
 use Kinetics\Contracts\PipeInterface;
 use Kinetics\Exceptions\InvalidPipeException;
+use Kinetics\Filters\SelectFilter;
 use Kinetics\Pipes\SearchPipe;
 use Kinetics\Table;
 use Kinetics\Tests\TestCase;
@@ -85,7 +86,6 @@ class TableTest extends TestCase
         $this->assertEquals('name', $column['key']);
         $this->assertTrue($column['sortable']);
         $this->assertTrue($column['searchable']);
-        $this->assertFalse($column['filterable']);
     }
 
     // Sorting
@@ -182,7 +182,8 @@ class TableTest extends TestCase
         $request = new Request(['filters' => ['role' => 'admin']]);
 
         $result = Table::model(TestUser::class)
-            ->columns([TextColumn::make('role')->filterable(['admin', 'user'])])
+            ->columns([TextColumn::make('role')])
+            ->filters([SelectFilter::make('role')->options(['admin', 'user'])])
             ->withRequest($request)
             ->make();
 
@@ -313,8 +314,9 @@ class TableTest extends TestCase
         $result = Table::model(TestUser::class)
             ->columns([
                 TextColumn::make('name')->sortable()->searchable(),
-                TextColumn::make('role')->filterable(),
+                TextColumn::make('role'),
             ])
+            ->filters([SelectFilter::make('role')])
             ->withRequest($request)
             ->make();
 

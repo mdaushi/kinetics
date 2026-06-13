@@ -17,7 +17,6 @@ class ColumnTest extends TestCase
         $this->assertEquals('name', $col->getSourceKey());
         $this->assertFalse($col->isSortable());
         $this->assertFalse($col->isSearchable());
-        $this->assertFalse($col->isFilterable());
         $this->assertNull($col->getRelation());
         $this->assertNull($col->getRelationKey());
         $this->assertNull($col->getFormatter());
@@ -104,15 +103,6 @@ class ColumnTest extends TestCase
     {
         $col = TextColumn::make('name')->searchable();
         $this->assertTrue($col->isSearchable());
-    }
-
-    public function test_filterable_flag_and_options(): void
-    {
-        $col = TextColumn::make('status')->filterable(['active', 'inactive']);
-        $arr = $col->toArray();
-
-        $this->assertTrue($col->isFilterable());
-        $this->assertEquals(['active', 'inactive'], $arr['filterOptions']);
     }
 
     public function test_hidden_column_visible_false(): void
@@ -254,8 +244,6 @@ class ColumnTest extends TestCase
         $this->assertArrayHasKey('label', $arr);
         $this->assertArrayHasKey('sortable', $arr);
         $this->assertArrayHasKey('searchable', $arr);
-        $this->assertArrayHasKey('filterable', $arr);
-        $this->assertArrayHasKey('filterOptions', $arr);
         $this->assertArrayHasKey('visible', $arr);
         $this->assertArrayHasKey('type', $arr);
         $this->assertArrayHasKey('meta', $arr);

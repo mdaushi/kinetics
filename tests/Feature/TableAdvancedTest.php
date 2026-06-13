@@ -11,6 +11,7 @@ use Kinetics\Actions\Action;
 use Kinetics\Actions\ActionGroup;
 use Kinetics\Columns\ActionColumn;
 use Kinetics\Columns\TextColumn;
+use Kinetics\Filters\SelectFilter;
 use Kinetics\Pipes\DateRangeFilterPipe;
 use Kinetics\Resources\TableResult;
 use Kinetics\Table;
@@ -138,7 +139,8 @@ class TableAdvancedTest extends TestCase
         $request = new Request(['filters' => ['status' => ['published', 'draft']]]);
 
         $result = Table::model(PostModel::class)
-            ->columns([TextColumn::make('status')->filterable()])
+            ->columns([TextColumn::make('status')])
+            ->filters([SelectFilter::make('status')])
             ->withRequest($request)
             ->make();
 
@@ -150,7 +152,8 @@ class TableAdvancedTest extends TestCase
         $request = new Request(['filters' => ['status' => ['published']]]);
 
         $result = Table::model(PostModel::class)
-            ->columns([TextColumn::make('status')->filterable()])
+            ->columns([TextColumn::make('status')])
+            ->filters([SelectFilter::make('status')])
             ->withRequest($request)
             ->make();
 
@@ -165,7 +168,8 @@ class TableAdvancedTest extends TestCase
         $request = new Request(['filters' => ['status' => null]]);
 
         $result = Table::model(PostModel::class)
-            ->columns([TextColumn::make('status')->filterable()])
+            ->columns([TextColumn::make('status')])
+            ->filters([SelectFilter::make('status')])
             ->withRequest($request)
             ->make();
 
@@ -178,7 +182,8 @@ class TableAdvancedTest extends TestCase
         $request = new Request(['filters' => ['status' => '']]);
 
         $result = Table::model(PostModel::class)
-            ->columns([TextColumn::make('status')->filterable()])
+            ->columns([TextColumn::make('status')])
+            ->filters([SelectFilter::make('status')])
             ->withRequest($request)
             ->make();
 
@@ -191,7 +196,8 @@ class TableAdvancedTest extends TestCase
         $request = new Request(['filters' => ['status' => [null, '', 'published']]]);
 
         $result = Table::model(PostModel::class)
-            ->columns([TextColumn::make('status')->filterable()])
+            ->columns([TextColumn::make('status')])
+            ->filters([SelectFilter::make('status')])
             ->withRequest($request)
             ->make();
 
