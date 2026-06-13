@@ -36,21 +36,16 @@ class ActionColumn extends Column
     /** @var array<Action|ActionGroup> */
     private array $actionDefinitions = [];
 
-    private string $columnKey;
-
-    private function __construct(string $key)
+    protected function __construct(string $key)
     {
         parent::__construct($key);
-        $this->label('Actions');
+        $this->label('');
         $this->type = 'actions';
     }
 
     public static function make(string $key = '__actions'): static
     {
-        $instance = new static($key);
-        $instance->columnKey = $key;
-
-        return $instance;
+        return new static($key);
     }
 
     /**
@@ -83,7 +78,12 @@ class ActionColumn extends Column
                 }
 
                 if ($definition instanceof ActionGroup) {
-                    return $definition->resolve($row);
+                    $resolvedGroup = $definition->resolve($row);
+                    if (empty($resolvedGroup) || empty($resolvedGroup['actions'])) {
+                        return null;
+                    }
+
+                    return $resolvedGroup;
                 }
 
                 return null;
@@ -96,5 +96,17 @@ class ActionColumn extends Column
     public function hasActions(): bool
     {
         return ! empty($this->actionDefinitions);
+    }
+
+    public function sortable(bool $value = true): static
+    {
+        // Action columns cannot be sorted
+        return $this;
+    }
+
+    public function searchable(bool $value = true): static
+    {
+        // Action columns cannot be searched
+        return $this;
     }
 }
