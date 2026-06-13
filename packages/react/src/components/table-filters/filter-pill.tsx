@@ -1,13 +1,15 @@
 import * as React from "react";
-import { Trash2, Search } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Input } from "../ui/input";
-import { Checkbox } from "../ui/checkbox";
 import { useDebouncedCallback } from "use-debounce";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
 import { TableFilter } from "@mdaushi/kinetics-core";
+import { TextFilterForm } from "./forms/text-filter-form";
+import { SelectFilterForm } from "./forms/select-filter-form";
+import { DateFilterForm } from "./forms/date-filter-form";
+import { NumberFilterForm } from "./forms/number-filter-form";
 
 export interface FilterPillProps {
   definition: TableFilter;
@@ -15,6 +17,60 @@ export interface FilterPillProps {
   onChange: (value: any) => void;
   onRemove: () => void;
   defaultOpen?: boolean;
+}
+
+function getDisplayValue(
+  definition: TableFilter,
+  operator: string,
+  value: any,
+): string {
+  if (!value) return "...";
+
+  switch (definition.type) {
+    case "select":
+      if (Array.isArray(value) && value.length > 0) {
+        const options = definition.meta?.options as any[];
+        return value
+          .map((v) => options?.find((o) => o.value == v)?.label ?? v)
+          .join(", ");
+      }
+      return "...";
+
+    case "date":
+    case "number":
+      if (definition.meta?.is_range || operator === "between") {
+        if (Array.isArray(value) && (value[0] || value[1])) {
+          return `${value[0] || "..."} to ${value[1] || "..."}`;
+        }
+        return "...";
+      }
+      return String(value);
+
+    case "text":
+    default:
+      return String(value);
+  }
+}
+
+function renderFilterForm(
+  definition: TableFilter,
+  operator: string,
+  value: any,
+  onChange: (val: any) => void,
+) {
+  const props = { definition, operator, value, onChange };
+  switch (definition.type) {
+    case "text":
+      return <TextFilterForm {...props} />;
+    case "number":
+      return <NumberFilterForm {...props} />;
+    case "select":
+      return <SelectFilterForm {...props} />;
+    case "date":
+      return <DateFilterForm {...props} />;
+    default:
+      return null;
+  }
 }
 
 export function FilterPill({
@@ -42,7 +98,6 @@ export function FilterPill({
   const [operator, setOperator] = React.useState(valObj.operator);
   const [value, setValue] = React.useState(valObj.value);
   const [isOpen, setIsOpen] = React.useState(defaultOpen || false);
-  const [searchQuery, setSearchQuery] = React.useState("");
 
   const debouncedOnChange = useDebouncedCallback((op, val) => {
     onChange({ operator: op, value: val });
@@ -58,30 +113,10 @@ export function FilterPill({
     debouncedOnChange(operator, newVal);
   };
 
-  // Sync internal state when opened
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open);
-    if (!open) setSearchQuery("");
-  };
-
-  // Format pill text based on type
-  let displayValue = "...";
-  if (
-    definition.type === "select" &&
-    Array.isArray(value) &&
-    value.length > 0
-  ) {
-    const selectedLabels = value.map((v) => {
-      const opt = definition.options?.find((o) => o.value == v);
-      return opt ? opt.label : v;
-    });
-    displayValue = selectedLabels.join(", ");
-  } else if (definition.type === "text" && value) {
-    displayValue = value;
-  }
+  const displayValue = getDisplayValue(definition, operator, value);
 
   return (
-    <Popover open={isOpen} onOpenChange={handleOpenChange}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger
         render={
           <Badge
@@ -140,75 +175,8 @@ export function FilterPill({
         </div>
 
         <div className="pt-2">
-          {definition.type === "text" && (
-            <Input
-              placeholder="Type here..."
-              value={value}
-              onChange={(e) => handleValueChange(e.target.value)}
-              className="h-8"
-              autoFocus
-            />
-          )}
-
-          {definition.type === "select" && (
-            <div className="flex flex-col gap-2">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder={`Search ${definition.label}...`}
-                  className="h-8 pl-8 text-xs"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <div className="max-h-[200px] overflow-y-auto pr-1 flex flex-col gap-1.5">
-                {definition.options
-                  ?.filter((opt) =>
-                    opt.label.toLowerCase().includes(searchQuery.toLowerCase()),
-                  )
-                  .map((opt) => {
-                    const isChecked =
-                      Array.isArray(value) && value.includes(String(opt.value));
-                    return (
-                      <label
-                        key={opt.value}
-                        className="flex items-center gap-2 rounded-md p-1.5 hover:bg-accent cursor-pointer"
-                      >
-                        <Checkbox
-                          checked={isChecked}
-                          onCheckedChange={(checked) => {
-                            let newVal = Array.isArray(value) ? [...value] : [];
-                            if (checked) {
-                              newVal.push(String(opt.value));
-                            } else {
-                              newVal = newVal.filter(
-                                (v) => v !== String(opt.value),
-                              );
-                            }
-                            handleValueChange(newVal);
-                          }}
-                        />
-                        <span className="text-sm">{opt.label}</span>
-                      </label>
-                    );
-                  })}
-              </div>
-            </div>
-          )}
+          {renderFilterForm(definition, operator, value, handleValueChange)}
         </div>
-
-        {definition.type === "select" &&
-          Array.isArray(value) &&
-          value.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full"
-              onClick={() => handleValueChange([])}
-            >
-              Clear selection
-            </Button>
-          )}
       </PopoverContent>
     </Popover>
   );

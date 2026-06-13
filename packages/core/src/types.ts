@@ -8,9 +8,9 @@ export interface TableFilterOption {
 export interface TableFilter {
   name: string;
   label: string;
-  type: "text" | "select" | string;
+  type: "text" | "select" | "date" | "number" | string;
   operators?: TableFilterOption[];
-  options?: TableFilterOption[];
+  meta: Record<string, unknown>;
 }
 
 export interface TableColumn {

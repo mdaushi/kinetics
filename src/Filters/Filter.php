@@ -2,6 +2,7 @@
 
 namespace Kinetics\Filters;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Kinetics\Contracts\FilterInterface;
 
@@ -16,6 +17,8 @@ abstract class Filter implements FilterInterface
     protected array $operators = [];
 
     protected ?string $column = null;
+
+    protected array $meta = [];
 
     protected static array $customResolvers = [];
 
@@ -111,12 +114,62 @@ abstract class Filter implements FilterInterface
             return;
         }
 
-        // Default operators mapping
+        if ($this->type === 'date') {
+            $this->applyDateOperator($query, $column, $operator, $value);
+        } else {
+            $this->applyStandardOperator($query, $column, $operator, $value);
+        }
+    }
+
+    protected function applyDateOperator(Builder $query, string $column, string $operator, mixed $value): void
+    {
+        if ($operator === 'between') {
+            if (is_array($value) && count($value) === 2 && ! empty($value[0]) && ! empty($value[1])) {
+                $query->whereBetween($column, [
+                    Carbon::parse($value[0])->startOfDay(),
+                    Carbon::parse($value[1])->endOfDay(),
+                ]);
+            } elseif (is_array($value) && count($value) === 2 && ! empty($value[0])) {
+                $query->whereDate($column, '>=', Carbon::parse($value[0])->startOfDay());
+            } elseif (is_array($value) && count($value) === 2 && ! empty($value[1])) {
+                $query->whereDate($column, '<=', Carbon::parse($value[1])->endOfDay());
+            }
+
+            return;
+        }
+
+        $date = Carbon::parse($value);
+
+        match ($operator) {
+            'equals', 'is' => $query->whereDate($column, '=', $date),
+            'not_equals', 'is_not' => $query->whereDate($column, '!=', $date),
+            '>' => $query->whereDate($column, '>', $date),
+            '>=' => $query->whereDate($column, '>=', $date),
+            '<' => $query->whereDate($column, '<', $date),
+            '<=' => $query->whereDate($column, '<=', $date),
+            default => throw new \InvalidArgumentException("Filter operator [{$operator}] is not supported for dates."),
+        };
+    }
+
+    protected function applyStandardOperator(Builder $query, string $column, string $operator, mixed $value): void
+    {
+        if ($operator === 'between') {
+            if (is_array($value) && count($value) === 2 && $value[0] !== null && $value[0] !== '' && $value[1] !== null && $value[1] !== '') {
+                $query->whereBetween($column, $value);
+            } elseif (is_array($value) && count($value) === 2 && $value[0] !== null && $value[0] !== '') {
+                $query->where($column, '>=', $value[0]);
+            } elseif (is_array($value) && count($value) === 2 && $value[1] !== null && $value[1] !== '') {
+                $query->where($column, '<=', $value[1]);
+            } elseif (! is_array($value) && $value !== null && $value !== '') {
+                $query->where($column, '>=', $value);
+            }
+
+            return;
+        }
+
         match ($operator) {
             'equals', 'is' => is_array($value) ? $query->whereIn($column, $value) : $query->where($column, '=', $value),
-            'not_equals', 'is_not' => is_array($value) ?
-                $query->whereNotIn($column, $value) :
-                $query->where($column, '!=', $value),
+            'not_equals', 'is_not' => is_array($value) ? $query->whereNotIn($column, $value) : $query->where($column, '!=', $value),
             'contains' => $query->where($column, 'like', "%{$value}%"),
             'starts_with' => $query->where($column, 'like', "{$value}%"),
             'ends_with' => $query->where($column, 'like', "%{$value}"),
@@ -168,6 +221,17 @@ abstract class Filter implements FilterInterface
         return $this->key;
     }
 
+    public function meta(string|array $key, mixed $value = null): static
+    {
+        if (is_array($key)) {
+            $this->meta = array_merge($this->meta, $key);
+        } else {
+            $this->meta[$key] = $value;
+        }
+
+        return $this;
+    }
+
     public function toArray(): array
     {
         return [
@@ -175,7 +239,7 @@ abstract class Filter implements FilterInterface
             'name' => $this->key,
             'label' => $this->label,
             'operators' => $this->formatOperators(),
-            // Subclasses will merge their specific properties here
+            'meta' => $this->meta,
         ];
     }
 

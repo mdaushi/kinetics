@@ -8,8 +8,6 @@ class SelectFilter extends Filter
 {
     protected ?string $type = 'select';
 
-    protected array $options = [];
-
     protected array $operators = ['is', 'is_not'];
 
     /**
@@ -19,9 +17,18 @@ class SelectFilter extends Filter
      */
     public function options(array $options): static
     {
-        $this->options = $options;
+        $formatted = [];
+        foreach ($options as $value => $label) {
+            if (is_int($value)) {
+                // Numeric array ['active', 'inactive'] -> value and label are the same
+                $formatted[] = ['value' => $label, 'label' => $label];
+            } else {
+                // Associative array ['active' => 'Active Status']
+                $formatted[] = ['value' => $value, 'label' => $label];
+            }
+        }
 
-        return $this;
+        return $this->meta('options', $formatted);
     }
 
     public function apply(Builder $query, mixed $payload): void
@@ -42,28 +49,5 @@ class SelectFilter extends Filter
         }
 
         $this->applyOperator($query, $column, $operator, $value);
-    }
-
-    public function toArray(): array
-    {
-        return array_merge(parent::toArray(), [
-            'options' => $this->formatOptions(),
-        ]);
-    }
-
-    private function formatOptions(): array
-    {
-        $formatted = [];
-        foreach ($this->options as $value => $label) {
-            if (is_int($value)) {
-                // Numeric array ['active', 'inactive'] -> value and label are the same
-                $formatted[] = ['value' => $label, 'label' => $label];
-            } else {
-                // Associative array ['active' => 'Active Status']
-                $formatted[] = ['value' => $value, 'label' => $label];
-            }
-        }
-
-        return $formatted;
     }
 }

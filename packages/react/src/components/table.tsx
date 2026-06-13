@@ -25,7 +25,7 @@ export function Table<TData extends Record<string, unknown>>({
   } = useTable({ table: serverData });
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <TableToolbar
         search={search}
         setSearch={setSearch}
