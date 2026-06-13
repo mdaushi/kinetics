@@ -35,6 +35,7 @@ export function Table<TData extends Record<string, unknown>>({
         filtersConfig={filtersConfig}
         setFilter={setFilter}
         reset={reset}
+        debounce={meta.debounce}
       />
       <RenderTable table={tableInstance} />
 

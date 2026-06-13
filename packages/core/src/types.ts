@@ -33,6 +33,7 @@ export interface TableMeta {
   from: number | null;
   to: number | null;
   options_per_page: number[];
+  debounce: number;
 }
 
 export interface TableState {

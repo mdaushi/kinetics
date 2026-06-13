@@ -17,6 +17,7 @@ export interface FilterPillProps {
   onChange: (value: any) => void;
   onRemove: () => void;
   defaultOpen?: boolean;
+  debounce?: number;
 }
 
 function getDisplayValue(
@@ -79,6 +80,7 @@ export function FilterPill({
   onChange,
   onRemove,
   defaultOpen,
+  debounce = 500,
 }: FilterPillProps) {
   // Normalize value to object format { operator, value }
   const valObj = React.useMemo(() => {
@@ -101,7 +103,7 @@ export function FilterPill({
 
   const debouncedOnChange = useDebouncedCallback((op, val) => {
     onChange({ operator: op, value: val });
-  }, 500);
+  }, debounce);
 
   const handleOperatorChange = (newOp: string) => {
     setOperator(newOp);

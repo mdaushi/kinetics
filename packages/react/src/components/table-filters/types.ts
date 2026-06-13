@@ -9,6 +9,7 @@ export interface TableFiltersProps {
   filters: TableFilter[];
   activeFilters: Record<string, any>;
   setFilter: (key: string, value: any) => void;
+  debounce?: number;
 
   draftFilters?: string[];
   onAddDraft?: (name: string) => void;

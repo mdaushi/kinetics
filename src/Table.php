@@ -39,6 +39,8 @@ class Table
 
     private TableConfig $config;
 
+    private int $debounce = 500;
+
     // Default pipe is always present — this order is IMPORTANT
     private array $defaultPipes = [
         SortPipe::class,
@@ -105,6 +107,17 @@ class Table
     public function perPage(int $default, int $max = 100): static
     {
         $this->config = $this->config->with(defaultPerPage: $default, maxPerPage: $max);
+
+        return $this;
+    }
+
+    /**
+     * Set debounce delay (ms) for search and filter inputs.
+     * Default: 500ms
+     */
+    public function debounce(int $ms): static
+    {
+        $this->debounce = $ms;
 
         return $this;
     }
@@ -262,6 +275,8 @@ class Table
             columns: $this->columns,
             filters: $this->filters,
         );
+
+        $context->setMeta('debounce', $this->debounce);
 
         // Titipkan context ke model — diambil oleh pipes
         $this->query->getModel()->datatableContext = $context;

@@ -15,6 +15,7 @@ interface TableToolbarProps {
   filtersConfig: TableFilter[];
   setFilter: (key: string, value: unknown) => void;
   reset: () => void;
+  debounce?: number;
 }
 export default function TableToolbar({
   search,
@@ -25,6 +26,7 @@ export default function TableToolbar({
   filtersConfig,
   setFilter,
   reset,
+  debounce,
 }: TableToolbarProps) {
   const [draftFilters, setDraftFilters] = React.useState<string[]>([]);
 
@@ -78,6 +80,7 @@ export default function TableToolbar({
             setDraftFilters((prev) => prev.filter((n) => n !== name))
           }
           setFilter={setFilter}
+          debounce={debounce}
         />
       )}
     </div>

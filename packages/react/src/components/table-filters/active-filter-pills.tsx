@@ -5,6 +5,7 @@ export function ActiveFilterPills({
   filters = [],
   activeFilters = {},
   setFilter,
+  debounce,
   draftFilters = [],
   onRemoveDraft,
 }: TableFiltersProps) {
@@ -35,6 +36,7 @@ export function ActiveFilterPills({
             onChange={(val) => setFilter(def.name, val)}
             onRemove={() => handleRemoveFilter(def.name)}
             defaultOpen={isDraft}
+            debounce={debounce}
           />
         );
       })}

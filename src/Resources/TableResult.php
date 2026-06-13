@@ -194,6 +194,7 @@ class TableResult implements \JsonSerializable
             'from' => $this->paginator->firstItem(),
             'to' => $this->paginator->lastItem(),
             'options_per_page' => $this->context->config->optionsPerPage,
+            'debounce' => $this->context->getMeta('debounce', 500),
         ];
     }
 

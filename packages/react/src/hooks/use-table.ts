@@ -26,13 +26,11 @@ export type { TableProps, TableColumn, TableMeta, TableState };
 export interface UseTableOptions<TData> {
   table: TableProps<TData>;
   url?: string;
-  searchDebounce?: number;
 }
 
 export function useTable<TData extends Record<string, unknown>>({
   table: serverData,
   url,
-  searchDebounce = 300,
 }: UseTableOptions<TData>) {
   const {
     data,
@@ -87,7 +85,7 @@ export function useTable<TData extends Record<string, unknown>>({
 
   const handleSearchChange = useDebouncedCallback((value: string) => {
     visit(ctrl.resolveSearchParams(value));
-  }, searchDebounce);
+  }, meta.debounce);
 
   const handleFilterChange = useCallback(
     (key: string, value: unknown) => {

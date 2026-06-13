@@ -10,7 +10,7 @@ class TableConfig
         public readonly string $defaultSort = 'id',
         public readonly string $defaultDirection = 'desc',
         public readonly bool $preserveKeys = false,
-        public readonly array $optionsPerPage = [10, 15, 25, 50, 100]
+        public readonly array $optionsPerPage = [10, 15, 25, 50, 100],
     ) {}
 
     /**
