@@ -51,7 +51,7 @@ export default function RenderTable<TData>({ table }: RenderTableProps<TData>) {
           ) : (
             <TableRow>
               <TableCell
-                colSpan={table.getAllColumns.length}
+                colSpan={table.getAllColumns().length}
                 className="h-24 text-center"
               >
                 No results.
