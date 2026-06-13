@@ -32,6 +32,7 @@ export interface TableMeta {
   total: number;
   from: number | null;
   to: number | null;
+  options_per_page: number[];
 }
 
 export interface TableState {

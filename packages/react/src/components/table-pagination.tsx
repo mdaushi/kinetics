@@ -47,7 +47,7 @@ export default function TablePagination<TData>({
               <SelectValue placeholder={meta.per_page} />
             </SelectTrigger>
             <SelectContent side="left" align="end">
-              {[10, 15, 50, 100].map((pageSize) => (
+              {(meta.options_per_page ?? [10, 15, 25, 50, 100]).map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

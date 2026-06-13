@@ -52,7 +52,7 @@ class Table
     {
         $this->query = $query;
         $this->request = $request;
-        $this->config = new TableConfig;
+        $this->config = TableConfig::fromConfig();
     }
 
     // Static entry points

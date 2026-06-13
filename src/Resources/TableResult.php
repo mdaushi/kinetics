@@ -193,6 +193,7 @@ class TableResult implements \JsonSerializable
             'total' => $this->paginator->total(),
             'from' => $this->paginator->firstItem(),
             'to' => $this->paginator->lastItem(),
+            'options_per_page' => $this->context->config->optionsPerPage,
         ];
     }
 

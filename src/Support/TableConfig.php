@@ -33,14 +33,18 @@ class TableConfig
         );
     }
 
-    // public static function fromArray(array $config): static
-    // {
-    //     return new static(
-    //         defaultPerPage: $config['default_per_page'] ?? 15,
-    //         maxPerPage: $config['max_per_page'] ?? 100,
-    //         defaultSort: $config['default_sort'] ?? 'id',
-    //         defaultDirection: $config['default_direction'] ?? 'desc',
-    //         preserveKeys: $config['preserve_keys'] ?? false,
-    //     );
-    // }
+    /**
+     * Create a TableConfig instance from the published Laravel config file.
+     * Falls back to default values if the config is not published.
+     */
+    public static function fromConfig(): static
+    {
+        return new static(
+            defaultPerPage: config('kinetics.default_per_page', 15),
+            maxPerPage: config('kinetics.max_per_page', 100),
+            defaultSort: config('kinetics.default_sort', 'id'),
+            defaultDirection: config('kinetics.default_direction', 'desc'),
+            optionsPerPage: config('kinetics.options_per_page', [10, 15, 25, 50, 100]),
+        );
+    }
 }
