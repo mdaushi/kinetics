@@ -34,7 +34,7 @@ class SelectFilterTest extends TestCase
         $this->assertEquals([
             ['value' => 'active', 'label' => 'Active Status'],
             ['value' => 'inactive', 'label' => 'Inactive Status'],
-        ], $array['options']);
+        ], $array['meta']['options']);
     }
 
     public function test_options_formatting_numeric()
@@ -47,7 +47,7 @@ class SelectFilterTest extends TestCase
         $this->assertEquals([
             ['value' => 'active', 'label' => 'active'],
             ['value' => 'inactive', 'label' => 'inactive'],
-        ], $array['options']);
+        ], $array['meta']['options']);
     }
 
     public function test_ignores_null_or_empty_values()
