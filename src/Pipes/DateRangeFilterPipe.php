@@ -30,15 +30,17 @@ class DateRangeFilterPipe implements PipeInterface
         $from = $request->get($this->fromParam);
         $to   = $request->get($this->toParam);
 
+        $column = $query->qualifyColumn($this->column);
+
         if ($from && $to) {
-            $query->whereBetween($this->column, [
+            $query->whereBetween($column, [
                 \Carbon\Carbon::parse($from)->startOfDay(),
                 \Carbon\Carbon::parse($to)->endOfDay(),
             ]);
         } elseif ($from) {
-            $query->where($this->column, '>=', \Carbon\Carbon::parse($from)->startOfDay());
+            $query->where($column, '>=', \Carbon\Carbon::parse($from)->startOfDay());
         } elseif ($to) {
-            $query->where($this->column, '<=', \Carbon\Carbon::parse($to)->endOfDay());
+            $query->where($column, '<=', \Carbon\Carbon::parse($to)->endOfDay());
         }
 
         return $next($query);

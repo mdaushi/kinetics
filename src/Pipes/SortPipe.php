@@ -43,7 +43,7 @@ class SortPipe implements PipeInterface
         // Not a registered sortable column — apply default sort if configured
         if (! $columnDef) {
             if ($ctx->config->defaultSort) {
-                $query->orderBy($ctx->config->defaultSort, $ctx->config->defaultDirection);
+                $query->orderBy($query->qualifyColumn($ctx->config->defaultSort), $ctx->config->defaultDirection);
             }
             return $next($query);
         }
@@ -59,7 +59,7 @@ class SortPipe implements PipeInterface
         }
 
         // Local column — direct orderBy
-        $query->orderBy($sortColumn, $sortDirection);
+        $query->orderBy($query->qualifyColumn($sortColumn), $sortDirection);
 
         return $next($query);
     }

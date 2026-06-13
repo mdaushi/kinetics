@@ -24,11 +24,13 @@ class TextFilter extends Filter
             return;
         }
 
+        $column = $query->qualifyColumn($this->getColumn());
+
         match ($operator) {
-            'equals' => $query->where($this->key, '=', $value),
-            'starts_with' => $query->where($this->key, 'like', "{$value}%"),
-            'ends_with' => $query->where($this->key, 'like', "%{$value}"),
-            default => $query->where($this->key, 'like', "%{$value}%"), // contains
+            'equals' => $query->where($column, '=', $value),
+            'starts_with' => $query->where($column, 'like', "{$value}%"),
+            'ends_with' => $query->where($column, 'like', "%{$value}"),
+            default => $query->where($column, 'like', "%{$value}%"), // contains
         };
     }
 }

@@ -10,6 +10,7 @@ abstract class Filter implements FilterInterface
     protected string $label;
     protected ?string $type = null;
     protected array $operators = [];
+    protected ?string $column = null;
 
     protected function __construct(string $key)
     {
@@ -26,6 +27,17 @@ abstract class Filter implements FilterInterface
     {
         $this->label = $label;
         return $this;
+    }
+
+    public function column(string $column): static
+    {
+        $this->column = $column;
+        return $this;
+    }
+
+    public function getColumn(): string
+    {
+        return $this->column ?? $this->key;
     }
 
     /**
