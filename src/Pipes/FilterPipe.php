@@ -3,9 +3,9 @@
 namespace Kinetics\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Kinetics\Contracts\PipeInterface;
 use Kinetics\Support\TableContext;
-use Illuminate\Database\Eloquent\Builder;
 
 class FilterPipe implements PipeInterface
 {
@@ -18,7 +18,7 @@ class FilterPipe implements PipeInterface
         }
 
         $requestFilters = $ctx->getFilters();
-        $filterObjects  = collect($ctx->getFilterObjects())->keyBy(fn($f) => $f->getKey());
+        $filterObjects = collect($ctx->getFilterObjects())->keyBy(fn ($f) => $f->getKey());
 
         foreach ($requestFilters as $column => $value) {
             // Only filter processes are allowed (those registered in the Table)

@@ -7,7 +7,9 @@ use Illuminate\Database\Eloquent\Builder;
 class SelectFilter extends Filter
 {
     protected ?string $type = 'select';
+
     protected array $options = [];
+
     protected array $operators = ['is', 'is_not'];
 
     /**
@@ -18,19 +20,13 @@ class SelectFilter extends Filter
     public function options(array $options): static
     {
         $this->options = $options;
+
         return $this;
     }
 
     public function apply(Builder $query, mixed $payload): void
     {
-        $operator = 'is';
-        $value = $payload;
-
-        // Support payload as an array: ['operator' => 'is', 'value' => '...']
-        if (is_array($payload) && isset($payload['operator'])) {
-            $operator = $payload['operator'];
-            $value = $payload['value'] ?? null;
-        }
+        [$operator, $value] = $this->parsePayload($payload);
 
         if ($value === null || $value === '') {
             return;
@@ -39,24 +35,13 @@ class SelectFilter extends Filter
         $column = $query->qualifyColumn($this->getColumn());
 
         if (is_array($value)) {
-            $value = array_filter($value, fn($v) => $v !== null && $v !== '');
+            $value = array_filter($value, fn ($v) => $v !== null && $v !== '');
             if (empty($value)) {
                 return;
             }
-
-            if ($operator === 'is_not') {
-                $query->whereNotIn($column, $value);
-            } else {
-                $query->whereIn($column, $value);
-            }
-            return;
         }
 
-        if ($operator === 'is_not') {
-            $query->where($column, '!=', $value);
-        } else {
-            $query->where($column, $value);
-        }
+        $this->applyOperator($query, $column, $operator, $value);
     }
 
     public function toArray(): array
@@ -78,6 +63,7 @@ class SelectFilter extends Filter
                 $formatted[] = ['value' => $value, 'label' => $label];
             }
         }
+
         return $formatted;
     }
 }

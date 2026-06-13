@@ -3,11 +3,11 @@
 namespace Kinetics\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Kinetics\Columns\Column;
 use Kinetics\Contracts\PipeInterface;
 use Kinetics\Pipes\Concerns\JoinsRelations;
 use Kinetics\Support\TableContext;
-use Illuminate\Database\Eloquent\Builder;
 
 class SearchPipe implements PipeInterface
 {
@@ -23,7 +23,7 @@ class SearchPipe implements PipeInterface
         }
 
         $columns = collect($ctx->getColumns())
-            ->filter(fn(Column $c) => $c->isSearchable());
+            ->filter(fn (Column $c) => $c->isSearchable());
 
         $localTable = $query->getModel()->getTable();
 

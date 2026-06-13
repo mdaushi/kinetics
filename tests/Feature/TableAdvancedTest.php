@@ -5,12 +5,14 @@ namespace Kinetics\Tests\Feature;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
 use Kinetics\Actions\Action;
 use Kinetics\Actions\ActionGroup;
 use Kinetics\Columns\ActionColumn;
 use Kinetics\Columns\TextColumn;
 use Kinetics\Pipes\DateRangeFilterPipe;
+use Kinetics\Resources\TableResult;
 use Kinetics\Table;
 use Kinetics\Tests\TestCase;
 
@@ -56,13 +58,13 @@ class TableAdvancedTest extends TestCase
         PostModel::create(['title' => 'Vue Composables',   'status' => 'published', 'views' => 200, 'category_id' => $catB->id, 'published_at' => '2024-06-01']);
     }
 
-    // Table::query() entry point 
+    // Table::query() entry point
 
     public function test_query_entry_point_works(): void
     {
         $result = Table::query(PostModel::query())
             ->columns([TextColumn::make('title')])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(3, $result['data']);
@@ -76,7 +78,7 @@ class TableAdvancedTest extends TestCase
                 TextColumn::make('title'),
                 TextColumn::make('category.name'),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(3, $result['data']);
@@ -92,7 +94,7 @@ class TableAdvancedTest extends TestCase
         $result = Table::model(PostModel::class)
             ->columns([TextColumn::make('views')->sortable()])
             ->defaultSort('views', 'desc')
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $views = array_column($result['data'], 'views');
@@ -119,8 +121,8 @@ class TableAdvancedTest extends TestCase
     {
         $result = Table::model(PostModel::class)
             ->columns([TextColumn::make('title')])
-            ->tap(fn($q) => $q->where('status', 'published'))
-            ->withRequest(new Request())
+            ->tap(fn ($q) => $q->where('status', 'published'))
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(2, $result['data']);
@@ -204,17 +206,17 @@ class TableAdvancedTest extends TestCase
             ->columns([
                 TextColumn::make('title'),
                 ActionColumn::make()->actions([
-                    Action::make('edit')->label('Edit')->href(fn($r) => '/posts/' . $r['id'] . '/edit'),
+                    Action::make('edit')->label('Edit')->href(fn ($r) => '/posts/'.$r['id'].'/edit'),
                     Action::delete(),
                 ]),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
             $this->assertArrayHasKey('__actions', $row);
             $this->assertCount(2, $row['__actions']);
-            $this->assertEquals('edit',   $row['__actions'][0]['key']);
+            $this->assertEquals('edit', $row['__actions'][0]['key']);
             $this->assertEquals('delete', $row['__actions'][1]['key']);
         }
     }
@@ -227,14 +229,14 @@ class TableAdvancedTest extends TestCase
                 ActionColumn::make()->actions([
                     Action::make('edit')
                         ->label('Edit')
-                        ->href(fn($r) => '/posts/' . $r['id']),
+                        ->href(fn ($r) => '/posts/'.$r['id']),
                 ]),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
-            $expected = '/posts/' . $row['id'];
+            $expected = '/posts/'.$row['id'];
             $this->assertEquals($expected, $row['__actions'][0]['href']);
         }
     }
@@ -247,16 +249,16 @@ class TableAdvancedTest extends TestCase
                 ActionColumn::make()->actions([
                     Action::make('publish')
                         ->label('Publish')
-                        ->visibleWhen(fn($r) => $r['status'] === 'draft'),
+                        ->visibleWhen(fn ($r) => $r['status'] === 'draft'),
                     Action::make('view')->label('View'), // selalu visible
                 ]),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
             $actions = $row['__actions'];
-            $keys    = array_column($actions, 'key');
+            $keys = array_column($actions, 'key');
 
             if ($row['status'] === 'draft') {
                 $this->assertContains('publish', $keys);
@@ -277,7 +279,7 @@ class TableAdvancedTest extends TestCase
                     Action::make('edit')->label('Edit'),
                 ]),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
@@ -299,14 +301,14 @@ class TableAdvancedTest extends TestCase
                     ]),
                 ]),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
             $actions = $row['__actions'];
             $this->assertCount(2, $actions);
             $this->assertEquals('action', $actions[0]['type']);
-            $this->assertEquals('group',  $actions[1]['type']);
+            $this->assertEquals('group', $actions[1]['type']);
             $this->assertCount(2, $actions[1]['actions']);
         }
     }
@@ -317,10 +319,10 @@ class TableAdvancedTest extends TestCase
     {
         $result = Table::model(PostModel::class)
             ->columns([TextColumn::make('title')])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->get();
 
-        $this->assertInstanceOf(\Kinetics\Resources\TableResult::class, $result);
+        $this->assertInstanceOf(TableResult::class, $result);
     }
 
     public function test_table_result_getters(): void
@@ -338,24 +340,24 @@ class TableAdvancedTest extends TestCase
         $this->assertCount(2, $result->getData());
         $this->assertNotEmpty($result->getMeta());
         $this->assertNotEmpty($result->getColumns());
-        $this->assertInstanceOf(\Illuminate\Pagination\LengthAwarePaginator::class, $result->getPaginator());
+        $this->assertInstanceOf(LengthAwarePaginator::class, $result->getPaginator());
     }
 
     public function test_table_result_is_json_serializable(): void
     {
         $result = Table::model(PostModel::class)
             ->columns([TextColumn::make('title')])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->get();
 
         $json = json_encode($result);
         $this->assertJson($json);
 
         $decoded = json_decode($json, true);
-        $this->assertArrayHasKey('data',    $decoded);
+        $this->assertArrayHasKey('data', $decoded);
         $this->assertArrayHasKey('columns', $decoded);
-        $this->assertArrayHasKey('meta',    $decoded);
-        $this->assertArrayHasKey('state',   $decoded);
+        $this->assertArrayHasKey('meta', $decoded);
+        $this->assertArrayHasKey('state', $decoded);
     }
 
     // DateRangeFilterPipe
@@ -364,7 +366,7 @@ class TableAdvancedTest extends TestCase
     {
         $request = new Request([
             'date_from' => '2024-01-01',
-            'date_to'   => '2024-04-01',
+            'date_to' => '2024-04-01',
         ]);
 
         $result = Table::model(PostModel::class)
@@ -412,7 +414,7 @@ class TableAdvancedTest extends TestCase
         $result = Table::model(PostModel::class)
             ->columns([TextColumn::make('title')])
             ->pipes([new DateRangeFilterPipe('published_at')])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(3, $result['data']);
@@ -422,7 +424,7 @@ class TableAdvancedTest extends TestCase
     {
         $request = new Request([
             'from' => '2024-05-01',
-            'to'   => '2024-12-31',
+            'to' => '2024-12-31',
         ]);
 
         $result = Table::model(PostModel::class)
@@ -451,7 +453,7 @@ class TableAdvancedTest extends TestCase
             ->columns([
                 TextColumn::make('created_at')->as('created_formatted')->date('d/m/Y'),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
@@ -468,11 +470,11 @@ class TableAdvancedTest extends TestCase
                 TextColumn::make('title'),
                 TextColumn::make('views')->hidden(),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $colKeys = array_column($result['columns'], 'key');
-        $visible  = array_filter($result['columns'], fn($c) => $c['visible']);
+        $visible = array_filter($result['columns'], fn ($c) => $c['visible']);
 
         // Data masih ada (hidden hanya flag untuk FE), tapi visible = false
         $this->assertContains('views', $colKeys);
@@ -483,12 +485,14 @@ class TableAdvancedTest extends TestCase
 class PostCategory extends Model
 {
     protected $table = 'categories';
+
     protected $fillable = ['name'];
 }
 
 class PostModel extends Model
 {
     protected $table = 'posts';
+
     protected $fillable = ['title', 'status', 'views', 'category_id', 'published_at'];
 
     protected $casts = [

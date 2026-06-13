@@ -2,6 +2,8 @@
 
 namespace Kinetics\Columns;
 
+use Carbon\Carbon;
+
 class TextColumn extends Column
 {
     protected ?string $type = 'text';
@@ -14,6 +16,7 @@ class TextColumn extends Column
         if ($condition) {
             $this->type = 'badge';
         }
+
         return $this;
     }
 
@@ -27,10 +30,11 @@ class TextColumn extends Column
     public function color(string|array $color): static
     {
         if ($this->type !== 'badge') {
-            throw new \LogicException("The color() method can only be called after calling badge().");
+            throw new \LogicException('The color() method can only be called after calling badge().');
         }
 
         $this->meta('color', $color);
+
         return $this;
     }
 
@@ -44,7 +48,7 @@ class TextColumn extends Column
                 return $value;
             }
             try {
-                return \Carbon\Carbon::parse($value)->format($format);
+                return Carbon::parse($value)->format($format);
             } catch (\Exception $e) {
                 return $value;
             }

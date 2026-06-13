@@ -3,9 +3,9 @@
 namespace Kinetics\Pipes;
 
 use Closure;
-use Kinetics\Contracts\PipeInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Kinetics\Contracts\PipeInterface;
 use Kinetics\Support\TableContext;
 
 /**

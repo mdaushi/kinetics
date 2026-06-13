@@ -17,7 +17,9 @@ namespace Kinetics\Actions;
 class ActionGroup
 {
     private string $label = 'Actions';
+
     private ?string $icon = 'ellipsis-vertical';
+
     /** @var Action[] */
     private array $actions = [];
 
@@ -34,6 +36,7 @@ class ActionGroup
     public function icon(string $icon): static
     {
         $this->icon = $icon;
+
         return $this;
     }
 
@@ -41,6 +44,7 @@ class ActionGroup
     public function actions(array $actions): static
     {
         $this->actions = $actions;
+
         return $this;
     }
 
@@ -50,8 +54,8 @@ class ActionGroup
     public function resolve(array|object $row): array
     {
         $resolved = collect($this->actions)
-            ->map(fn(Action $a) => $a->resolve($row))
-            ->filter(fn($a) => ! empty($a))
+            ->map(fn (Action $a) => $a->resolve($row))
+            ->filter(fn ($a) => ! empty($a))
             ->values()
             ->toArray();
 

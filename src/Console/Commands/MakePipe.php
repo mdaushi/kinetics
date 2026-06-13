@@ -39,10 +39,11 @@ class MakePipe extends Command
             ? app_path($this->option('path'))
             : app_path(config('kinetics.pipe_path', 'Pipes'));
 
-        $filePath = $outputPath . DIRECTORY_SEPARATOR . $name . '.php';
+        $filePath = $outputPath.DIRECTORY_SEPARATOR.$name.'.php';
 
         if ($this->files->exists($filePath)) {
             $this->components->error("Pipe [{$name}] already exists.");
+
             return self::FAILURE;
         }
 
@@ -54,7 +55,7 @@ class MakePipe extends Command
 
         $this->files->put($filePath, $stub);
 
-        $relative = str_replace(base_path() . DIRECTORY_SEPARATOR, '', $filePath);
+        $relative = str_replace(base_path().DIRECTORY_SEPARATOR, '', $filePath);
 
         $this->components->info("Pipe [{$relative}] created successfully.");
 
@@ -81,10 +82,10 @@ class MakePipe extends Command
      */
     protected function resolveNamespace(string $outputPath): string
     {
-        $appPath   = realpath(app_path()) ?: app_path();
+        $appPath = realpath(app_path()) ?: app_path();
         $realOutput = realpath($outputPath) ?: $outputPath;
 
-        $relative = ltrim(str_replace($appPath, '', $realOutput), DIRECTORY_SEPARATOR . '/');
+        $relative = ltrim(str_replace($appPath, '', $realOutput), DIRECTORY_SEPARATOR.'/');
 
         $rootNamespace = rtrim(app()->getNamespace(), '\\');
 
@@ -94,7 +95,7 @@ class MakePipe extends Command
 
         $suffix = str_replace(DIRECTORY_SEPARATOR, '\\', $relative);
 
-        return $rootNamespace . '\\' . $suffix;
+        return $rootNamespace.'\\'.$suffix;
     }
 
     /**
@@ -122,7 +123,7 @@ class MakePipe extends Command
             return $custom;
         }
 
-        return __DIR__ . '/../stubs/pipe.stub';
+        return __DIR__.'/../stubs/pipe.stub';
     }
 
     /**

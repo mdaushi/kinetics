@@ -2,15 +2,16 @@
 
 namespace Kinetics;
 
-use Kinetics\Pipes\FilterPipe;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pipeline\Pipeline;
 use Kinetics\Columns\Column;
+use Kinetics\Contracts\FilterInterface;
 use Kinetics\Contracts\PipeInterface;
 use Kinetics\Exceptions\InvalidPipeException;
+use Kinetics\Pipes\FilterPipe;
 use Kinetics\Pipes\PaginatePipe;
 use Kinetics\Pipes\SearchPipe;
 use Kinetics\Pipes\SortPipe;
@@ -21,16 +22,17 @@ use Kinetics\Support\TableContext;
 class Table
 {
     protected Builder $query;
+
     protected Request $request;
 
     /** @var Column[] */
     private array $columns = [];
 
-    /** @var \Kinetics\Contracts\FilterInterface[] */
+    /** @var FilterInterface[] */
     private array $filters = [];
 
     /** @var class-string<PipeInterface>[]|PipeInterface[] */
-    private array $extraPipes   = [];
+    private array $extraPipes = [];
 
     /** @var class-string<PipeInterface>[] */
     private array $removedPipes = [];
@@ -50,13 +52,13 @@ class Table
     {
         $this->query = $query;
         $this->request = $request;
-        $this->config = new TableConfig();
+        $this->config = new TableConfig;
     }
 
     // Static entry points
     public static function model(string $modelClass): static
     {
-        $model = new $modelClass();
+        $model = new $modelClass;
 
         if (! $model instanceof Model) {
             throw new \InvalidArgumentException("{$modelClass} must be an Eloquent Model.");
@@ -76,22 +78,24 @@ class Table
     /**
      * Define column definitions.
      *
-     * @param Column[] $columns
+     * @param  Column[]  $columns
      */
     public function columns(array $columns): static
     {
         $this->columns = $columns;
+
         return $this;
     }
 
     /**
      * Define filter definitions.
      *
-     * @param \Kinetics\Contracts\FilterInterface[] $filters
+     * @param  FilterInterface[]  $filters
      */
     public function filters(array $filters): static
     {
         $this->filters = $filters;
+
         return $this;
     }
 
@@ -101,6 +105,7 @@ class Table
     public function perPage(int $default, int $max = 100): static
     {
         $this->config = $this->config->with(defaultPerPage: $default, maxPerPage: $max);
+
         return $this;
     }
 
@@ -110,6 +115,7 @@ class Table
     public function defaultSort(string $column, string $direction = 'desc'): static
     {
         $this->config = $this->config->with(defaultSort: $column, defaultDirection: $direction);
+
         return $this;
     }
 
@@ -117,7 +123,7 @@ class Table
      * Add a custom pipe. It can be a class-string or an instance.
      * Custom pipes are inserted BEFORE PaginatePipe.
      *
-     * @param array<class-string<PipeInterface>|PipeInterface> $pipes
+     * @param  array<class-string<PipeInterface>|PipeInterface>  $pipes
      */
     public function pipes(array $pipes): static
     {
@@ -126,17 +132,19 @@ class Table
         }
 
         $this->extraPipes = array_merge($this->extraPipes, $pipes);
+
         return $this;
     }
 
     /**
      * Remove unnecessary default pipes.
      *
-     * @param array<class-string<PipeInterface>> $pipes
+     * @param  array<class-string<PipeInterface>>  $pipes
      */
     public function withoutPipes(array $pipes): static
     {
         $this->removedPipes = array_merge($this->removedPipes, $pipes);
+
         return $this;
     }
 
@@ -149,6 +157,7 @@ class Table
     public function tap(\Closure $callback): static
     {
         $callback($this->query);
+
         return $this;
     }
 
@@ -158,6 +167,7 @@ class Table
     public function withRequest(Request $request): static
     {
         $this->request = $request;
+
         return $this;
     }
 
@@ -222,6 +232,7 @@ class Table
     public function paginate(): LengthAwarePaginator
     {
         $this->buildContext();
+
         return $this->runPipeline();
     }
 
@@ -277,9 +288,9 @@ class Table
     private function assemblePipes(): array
     {
         // Pisahkan PaginatePipe dari default pipes agar custom pipes bisa disisipkan sebelum paginator berjalan
-        $before  = array_filter(
+        $before = array_filter(
             $this->defaultPipes,
-            fn($p) => $p !== PaginatePipe::class && ! in_array($p, $this->removedPipes)
+            fn ($p) => $p !== PaginatePipe::class && ! in_array($p, $this->removedPipes)
         );
 
         $hasPaginate = ! in_array(PaginatePipe::class, $this->removedPipes);
@@ -302,6 +313,7 @@ class Table
             if (is_string($pipe)) {
                 return app($pipe);
             }
+
             return $pipe;
         }, $pipes);
     }

@@ -2,8 +2,8 @@
 
 namespace Kinetics\Tests;
 
-use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Kinetics\KineticsServiceProvider;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {

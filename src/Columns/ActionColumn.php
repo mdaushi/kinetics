@@ -48,16 +48,18 @@ class ActionColumn extends Column
     public static function make(string $key = '__actions'): static
     {
         $instance = new static($key);
-        $instance->columnKey  = $key;
+        $instance->columnKey = $key;
+
         return $instance;
     }
 
     /**
-     * @param array<Action|ActionGroup> $actions
+     * @param  array<Action|ActionGroup>  $actions
      */
     public function actions(array $actions): static
     {
         $this->actionDefinitions = $actions;
+
         return $this;
     }
 
@@ -76,6 +78,7 @@ class ActionColumn extends Column
                     if (empty($resolved)) {
                         return null;
                     }
+
                     return array_merge(['type' => 'action'], $resolved);
                 }
 

@@ -162,7 +162,7 @@ class ColumnTest extends TestCase
 
     public function test_format_using_stored(): void
     {
-        $formatter = fn($v) => strtoupper($v);
+        $formatter = fn ($v) => strtoupper($v);
         $col = TextColumn::make('name')->formatUsing($formatter);
 
         $this->assertSame($formatter, $col->getFormatter());

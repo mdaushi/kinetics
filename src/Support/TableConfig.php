@@ -11,8 +11,7 @@ class TableConfig
         public readonly string $defaultDirection = 'desc',
         public readonly bool $preserveKeys = false,
         public readonly array $optionsPerPage = [10, 15, 25, 50, 100]
-    ) {
-    }
+    ) {}
 
     /**
      * Return a new instance with the given fields overridden.

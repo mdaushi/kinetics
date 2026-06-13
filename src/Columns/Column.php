@@ -7,15 +7,25 @@ use Kinetics\Contracts\ColumnInterface;
 abstract class Column implements ColumnInterface
 {
     protected string $key;
+
     protected string $outputKey;
+
     protected string $label;
+
     protected bool $sortable = false;
+
     protected bool $searchable = false;
+
     protected bool $visible = true;
+
     protected ?string $type = 'text';
+
     protected array $meta = [];
+
     protected ?string $relation = null;
+
     protected ?string $relationKey = null;
+
     protected ?\Closure $formatUsing = null;
 
     protected function __construct(string $key)
@@ -28,7 +38,7 @@ abstract class Column implements ColumnInterface
             $this->outputKey = $key;
         }
 
-        $this->key   = $key;
+        $this->key = $key;
         $this->label = str(str_replace('.', '_', $key))->replace('_', ' ')->title()->toString();
     }
 
@@ -44,6 +54,7 @@ abstract class Column implements ColumnInterface
     public function label(string $label): static
     {
         $this->label = $label;
+
         return $this;
     }
 
@@ -59,26 +70,28 @@ abstract class Column implements ColumnInterface
     public function as(string $outputKey): static
     {
         $this->outputKey = $outputKey;
+
         return $this;
     }
 
     public function sortable(bool $value = true): static
     {
         $this->sortable = $value;
+
         return $this;
     }
 
     public function searchable(bool $value = true): static
     {
         $this->searchable = $value;
+
         return $this;
     }
 
-
-
     public function hidden(bool $value = true): static
     {
-        $this->visible = !$value;
+        $this->visible = ! $value;
+
         return $this;
     }
 
@@ -89,6 +102,7 @@ abstract class Column implements ColumnInterface
         } else {
             $this->meta[$key] = $value;
         }
+
         return $this;
     }
 
@@ -106,6 +120,7 @@ abstract class Column implements ColumnInterface
     {
         $this->relation = $relation;
         $this->relationKey = $relationKey;
+
         return $this;
     }
 
@@ -118,6 +133,7 @@ abstract class Column implements ColumnInterface
     public function formatUsing(\Closure $callback): static
     {
         $this->formatUsing = $callback;
+
         return $this;
     }
 

@@ -2,9 +2,9 @@
 
 namespace Kinetics\Pipes\Concerns;
 
-use Kinetics\Columns\Column;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Kinetics\Columns\Column;
 
 trait JoinsRelations
 {

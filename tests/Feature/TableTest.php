@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Kinetics\Columns\TextColumn;
+use Kinetics\Contracts\PipeInterface;
 use Kinetics\Exceptions\InvalidPipeException;
 use Kinetics\Pipes\SearchPipe;
 use Kinetics\Table;
@@ -51,20 +52,20 @@ class TableTest extends TestCase
                 TextColumn::make('name')->sortable()->searchable(),
                 TextColumn::make('email')->sortable(),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
-        $this->assertArrayHasKey('data',    $result);
+        $this->assertArrayHasKey('data', $result);
         $this->assertArrayHasKey('columns', $result);
-        $this->assertArrayHasKey('meta',    $result);
-        $this->assertArrayHasKey('state',   $result);
+        $this->assertArrayHasKey('meta', $result);
+        $this->assertArrayHasKey('state', $result);
     }
 
     public function test_data_contains_all_records_by_default(): void
     {
         $result = Table::model(TestUser::class)
             ->columns([TextColumn::make('name')])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(3, $result['data']);
@@ -76,7 +77,7 @@ class TableTest extends TestCase
             ->columns([
                 TextColumn::make('name')->sortable()->searchable(),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $column = $result['columns'][0];
@@ -239,10 +240,12 @@ class TableTest extends TestCase
 
     public function test_custom_pipe_is_applied(): void
     {
-        $adminOnlyPipe = new class implements \Kinetics\Contracts\PipeInterface {
+        $adminOnlyPipe = new class implements PipeInterface
+        {
             public function handle(Builder $query, \Closure $next): mixed
             {
                 $query->where('role', 'admin');
+
                 return $next($query);
             }
         };
@@ -250,13 +253,13 @@ class TableTest extends TestCase
         $result = Table::model(TestUser::class)
             ->columns([TextColumn::make('name')])
             ->pipes([$adminOnlyPipe])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(2, $result['data']);
     }
 
-    public function test_withoutPipes_removes_search(): void
+    public function test_without_pipes_removes_search(): void
     {
         $request = new Request(['search' => 'alice']);
 
@@ -286,9 +289,9 @@ class TableTest extends TestCase
         $result = Table::model(TestUser::class)
             ->columns([
                 TextColumn::make('role')
-                    ->formatUsing(fn($val) => strtoupper($val)),
+                    ->formatUsing(fn ($val) => strtoupper($val)),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
@@ -301,10 +304,10 @@ class TableTest extends TestCase
     public function test_state_reflects_current_request(): void
     {
         $request = new Request([
-            'sort'      => 'name',
+            'sort' => 'name',
             'direction' => 'desc',
-            'search'    => 'ali',
-            'filters'   => ['role' => 'admin'],
+            'search' => 'ali',
+            'filters' => ['role' => 'admin'],
         ]);
 
         $result = Table::model(TestUser::class)
@@ -316,9 +319,9 @@ class TableTest extends TestCase
             ->make();
 
         $state = $result['state'];
-        $this->assertEquals('name',  $state['sort']);
-        $this->assertEquals('desc',  $state['direction']);
-        $this->assertEquals('ali',   $state['search']);
+        $this->assertEquals('name', $state['sort']);
+        $this->assertEquals('desc', $state['direction']);
+        $this->assertEquals('ali', $state['search']);
         $this->assertEquals(['role' => 'admin'], $state['filters']);
     }
 
@@ -332,7 +335,7 @@ class TableTest extends TestCase
                 TextColumn::make('name'),
                 TextColumn::make('category.name'),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(3, $result['data']);
@@ -351,14 +354,14 @@ class TableTest extends TestCase
             ->columns([
                 TextColumn::make('category.name'),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         // Label harus 'Category Name', bukan 'Category.name'
         $this->assertEquals('Category Name', $result['columns'][0]['label']);
     }
 
-    public function test_dot_notation_search_uses_whereHas(): void
+    public function test_dot_notation_search_uses_where_has(): void
     {
         $request = new Request(['search' => 'Engineering']);
 
@@ -390,7 +393,7 @@ class TableTest extends TestCase
         $categories = array_column($result['data'], 'category_name');
         $this->assertEquals('Engineering', $categories[0]);
         $this->assertEquals('Engineering', $categories[1]);
-        $this->assertEquals('Marketing',   $categories[2]);
+        $this->assertEquals('Marketing', $categories[2]);
     }
 
     public function test_dot_notation_formatter_chains_correctly(): void
@@ -399,9 +402,9 @@ class TableTest extends TestCase
         $result = Table::model(TestUser::class)
             ->columns([
                 TextColumn::make('category.name')
-                    ->formatUsing(fn($val) => strtoupper((string) $val)),
+                    ->formatUsing(fn ($val) => strtoupper((string) $val)),
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         foreach ($result['data'] as $row) {
@@ -418,7 +421,7 @@ class TableTest extends TestCase
                 TextColumn::make('group')          // custom output key
                     ->relation('category', 'name'), // explicit override
             ])
-            ->withRequest(new Request())
+            ->withRequest(new Request)
             ->make();
 
         $this->assertCount(3, $result['data']);
@@ -432,12 +435,14 @@ class TableTest extends TestCase
 class TestCategory extends Model
 {
     protected $table = 'categories';
+
     protected $fillable = ['name'];
 }
 
 class TestUser extends Model
 {
     protected $table = 'users';
+
     protected $fillable = ['name', 'email', 'role', 'category_id'];
 
     public function category(): BelongsTo

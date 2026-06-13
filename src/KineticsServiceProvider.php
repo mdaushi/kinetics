@@ -10,7 +10,7 @@ class KineticsServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/kinetics.php',
+            __DIR__.'/../config/kinetics.php',
             'kinetics',
         );
     }
@@ -19,7 +19,7 @@ class KineticsServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/kinetics.php' => config_path('kinetics.php'),
+                __DIR__.'/../config/kinetics.php' => config_path('kinetics.php'),
             ], 'kinetics-config');
 
             $this->commands([

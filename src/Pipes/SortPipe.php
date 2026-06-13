@@ -3,11 +3,11 @@
 namespace Kinetics\Pipes;
 
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Kinetics\Columns\Column;
 use Kinetics\Contracts\PipeInterface;
 use Kinetics\Pipes\Concerns\JoinsRelations;
 use Kinetics\Support\TableContext;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Handles all sorting — both local columns and relation columns.
@@ -38,13 +38,14 @@ class SortPipe implements PipeInterface
 
         // Find the column definition — must be sortable and exist in column list
         $columnDef = collect($ctx->getColumns())
-            ->first(fn(Column $c) => $c->getKey() === $sortColumn && $c->isSortable());
+            ->first(fn (Column $c) => $c->getKey() === $sortColumn && $c->isSortable());
 
         // Not a registered sortable column — apply default sort if configured
         if (! $columnDef) {
             if ($ctx->config->defaultSort) {
                 $query->orderBy($query->qualifyColumn($ctx->config->defaultSort), $ctx->config->defaultDirection);
             }
+
             return $next($query);
         }
 
@@ -55,6 +56,7 @@ class SortPipe implements PipeInterface
                 $relatedTable = $relationInstance->getRelated()->getTable();
                 $query->orderBy("{$relatedTable}.{$columnDef->getRelationKey()}", $sortDirection);
             }
+
             return $next($query);
         }
 

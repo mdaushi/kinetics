@@ -4,6 +4,4 @@ namespace Kinetics\Exceptions;
 
 use RuntimeException;
 
-class TableException extends RuntimeException
-{
-}
+class TableException extends RuntimeException {}

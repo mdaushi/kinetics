@@ -2,10 +2,11 @@
 
 namespace Kinetics\Pipes;
 
+use Carbon\Carbon;
 use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Kinetics\Contracts\PipeInterface;
 use Kinetics\Support\TableContext;
-use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Handles the request's date range filter:
@@ -19,8 +20,7 @@ class DateRangeFilterPipe implements PipeInterface
         private readonly string $column = 'created_at',
         private readonly string $fromParam = 'date_from',
         private readonly string $toParam = 'date_to',
-    ) {
-    }
+    ) {}
 
     public function handle(Builder $query, Closure $next): mixed
     {
@@ -28,19 +28,19 @@ class DateRangeFilterPipe implements PipeInterface
         $request = $ctx instanceof TableContext ? $ctx->request : request();
 
         $from = $request->get($this->fromParam);
-        $to   = $request->get($this->toParam);
+        $to = $request->get($this->toParam);
 
         $column = $query->qualifyColumn($this->column);
 
         if ($from && $to) {
             $query->whereBetween($column, [
-                \Carbon\Carbon::parse($from)->startOfDay(),
-                \Carbon\Carbon::parse($to)->endOfDay(),
+                Carbon::parse($from)->startOfDay(),
+                Carbon::parse($to)->endOfDay(),
             ]);
         } elseif ($from) {
-            $query->where($column, '>=', \Carbon\Carbon::parse($from)->startOfDay());
+            $query->where($column, '>=', Carbon::parse($from)->startOfDay());
         } elseif ($to) {
-            $query->where($column, '<=', \Carbon\Carbon::parse($to)->endOfDay());
+            $query->where($column, '<=', Carbon::parse($to)->endOfDay());
         }
 
         return $next($query);

@@ -50,7 +50,7 @@ class ActionTest extends TestCase
         $resolved = $action->resolve(['id' => 1]);
 
         $this->assertEquals('view', $resolved['key']);
-        $this->assertEquals('eye',  $resolved['icon']);
+        $this->assertEquals('eye', $resolved['icon']);
     }
 
     // href resolution
@@ -59,7 +59,7 @@ class ActionTest extends TestCase
     {
         $action = Action::make('edit')
             ->label('Edit')
-            ->href(fn($row) => '/users/' . $row['id'] . '/edit');
+            ->href(fn ($row) => '/users/'.$row['id'].'/edit');
 
         $resolved = $action->resolve(['id' => 42]);
 
@@ -80,7 +80,7 @@ class ActionTest extends TestCase
     {
         $action = Action::make('approve')
             ->label('Approve')
-            ->visibleWhen(fn($row) => $row['status'] === 'pending');
+            ->visibleWhen(fn ($row) => $row['status'] === 'pending');
 
         // Status 'active' → not visible → empty array
         $resolved = $action->resolve(['id' => 1, 'status' => 'active']);
@@ -91,7 +91,7 @@ class ActionTest extends TestCase
     {
         $action = Action::make('approve')
             ->label('Approve')
-            ->visibleWhen(fn($row) => $row['status'] === 'pending');
+            ->visibleWhen(fn ($row) => $row['status'] === 'pending');
 
         $resolved = $action->resolve(['id' => 1, 'status' => 'pending']);
         $this->assertEquals('approve', $resolved['key']);
@@ -103,7 +103,7 @@ class ActionTest extends TestCase
     {
         $action = Action::make('edit')
             ->label('Edit')
-            ->disabledWhen(fn($row) => $row['locked'] === true);
+            ->disabledWhen(fn ($row) => $row['locked'] === true);
 
         $resolved = $action->resolve(['id' => 1, 'locked' => true]);
         $this->assertTrue($resolved['disabled']);
@@ -123,7 +123,7 @@ class ActionTest extends TestCase
         $resolved = $action->resolve(['id' => 1]);
 
         $this->assertTrue($resolved['confirm'] !== null);
-        $this->assertEquals('Delete record?',       $resolved['confirm']['title']);
+        $this->assertEquals('Delete record?', $resolved['confirm']['title']);
         $this->assertEquals('This cannot be undone.', $resolved['confirm']['message']);
     }
 
@@ -184,8 +184,8 @@ class ActionTest extends TestCase
 
         $resolved = $action->resolve(['id' => 1]);
 
-        $this->assertEquals(['admin'],  $resolved['meta']['permissions']);
-        $this->assertEquals('danger',   $resolved['meta']['confirm_type']);
+        $this->assertEquals(['admin'], $resolved['meta']['permissions']);
+        $this->assertEquals('danger', $resolved['meta']['confirm_type']);
     }
 
     // ActionGroup
@@ -195,16 +195,16 @@ class ActionTest extends TestCase
         $group = ActionGroup::make('More')
             ->actions([
                 Action::make('approve')->label('Approve')
-                    ->visibleWhen(fn($r) => $r['status'] === 'pending'),
+                    ->visibleWhen(fn ($r) => $r['status'] === 'pending'),
                 Action::make('reject')->label('Reject')
-                    ->visibleWhen(fn($r) => $r['status'] === 'pending'),
+                    ->visibleWhen(fn ($r) => $r['status'] === 'pending'),
                 Action::make('archive')->label('Archive'),
             ]);
 
         $resolved = $group->resolve(['id' => 1, 'status' => 'pending']);
 
         $this->assertEquals('group', $resolved['type']);
-        $this->assertEquals('More',  $resolved['label']);
+        $this->assertEquals('More', $resolved['label']);
         $this->assertCount(3, $resolved['actions']); // semua visible
     }
 
@@ -213,7 +213,7 @@ class ActionTest extends TestCase
         $group = ActionGroup::make('More')
             ->actions([
                 Action::make('approve')->label('Approve')
-                    ->visibleWhen(fn($r) => $r['status'] === 'pending'),
+                    ->visibleWhen(fn ($r) => $r['status'] === 'pending'),
                 Action::make('archive')->label('Archive'), // selalu visible
             ]);
 

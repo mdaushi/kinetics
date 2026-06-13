@@ -5,7 +5,7 @@ namespace Kinetics\Support;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Kinetics\Columns\Column;
-use Kinetics\Support\TableConfig;
+use Kinetics\Contracts\FilterInterface;
 
 /**
  * The context object carried throughout the pipeline.
@@ -18,7 +18,7 @@ class TableContext
     /** @var Column[] */
     private array $columns;
 
-    /** @var \Kinetics\Contracts\FilterInterface[] */
+    /** @var FilterInterface[] */
     private array $filters;
 
     private array $meta = [];
@@ -45,8 +45,8 @@ class TableContext
     public function getSortableKeys(): array
     {
         return collect($this->columns)
-            ->filter(fn(Column $c) => $c->isSortable())
-            ->map(fn(Column $c) => $c->getKey())
+            ->filter(fn (Column $c) => $c->isSortable())
+            ->map(fn (Column $c) => $c->getKey())
             ->values()
             ->toArray();
     }
@@ -54,13 +54,13 @@ class TableContext
     public function getSearchableKeys(): array
     {
         return collect($this->columns)
-            ->filter(fn(Column $c) => $c->isSearchable())
-            ->map(fn(Column $c) => $c->getKey())
+            ->filter(fn (Column $c) => $c->isSearchable())
+            ->map(fn (Column $c) => $c->getKey())
             ->values()
             ->toArray();
     }
 
-    /** @return \Kinetics\Contracts\FilterInterface[] */
+    /** @return FilterInterface[] */
     public function getFilterObjects(): array
     {
         return $this->filters;
@@ -69,7 +69,7 @@ class TableContext
     public function getFilterableKeys(): array
     {
         return collect($this->filters)
-            ->map(fn($f) => $f->getKey())
+            ->map(fn ($f) => $f->getKey())
             ->values()
             ->toArray();
     }
@@ -77,7 +77,7 @@ class TableContext
     public function getFiltersArray(): array
     {
         return collect($this->filters)
-            ->map(fn($f) => $f->toArray())
+            ->map(fn ($f) => $f->toArray())
             ->values()
             ->toArray();
     }
@@ -91,8 +91,8 @@ class TableContext
     public function getRelationNames(): array
     {
         return collect($this->columns)
-            ->filter(fn(Column $c) => $c->getRelation() !== null)
-            ->map(fn(Column $c) => $c->getRelation())
+            ->filter(fn (Column $c) => $c->getRelation() !== null)
+            ->map(fn (Column $c) => $c->getRelation())
             ->unique()
             ->values()
             ->toArray();
@@ -108,12 +108,14 @@ class TableContext
     public function getSortDirection(): string
     {
         $dir = strtolower((string) $this->request->get('direction', 'asc'));
+
         return in_array($dir, ['asc', 'desc']) ? $dir : 'asc';
     }
 
     public function getSearch(): ?string
     {
         $search = (string) $this->request->get('search', '');
+
         return strlen($search) >= 2 ? $search : null;
     }
 
@@ -125,6 +127,7 @@ class TableContext
     public function getPerPage(): int
     {
         $requested = (int) $this->request->get('per_page', $this->config->defaultPerPage);
+
         return min(max($requested, 1), $this->config->maxPerPage);
     }
 

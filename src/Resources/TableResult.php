@@ -3,6 +3,7 @@
 namespace Kinetics\Resources;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Model;
 use Kinetics\Columns\ActionColumn;
 use Kinetics\Columns\Column;
 use Kinetics\Support\TableContext;
@@ -17,8 +18,7 @@ class TableResult implements \JsonSerializable
         private readonly LengthAwarePaginator $paginator,
         private readonly TableContext $context,
         private readonly array $columns,
-    ) {
-    }
+    ) {}
 
     /**
      * Called automatically by json_encode() / response()->json().
@@ -116,28 +116,28 @@ class TableResult implements \JsonSerializable
     private function transformData(): array
     {
         $formatterColumns = collect($this->columns)
-            ->filter(fn(Column $c) => ! ($c instanceof ActionColumn) && $c->getFormatter() !== null)
+            ->filter(fn (Column $c) => ! ($c instanceof ActionColumn) && $c->getFormatter() !== null)
             ->values();
 
         /** @var Column[] $relationColumns */
         $relationColumns = collect($this->columns)
-            ->filter(fn(Column $c) => ! ($c instanceof ActionColumn) && $c->getRelation() !== null)
+            ->filter(fn (Column $c) => ! ($c instanceof ActionColumn) && $c->getRelation() !== null)
             ->values()
             ->toArray();
 
         /** @var ActionColumn[] $actionColumns */
         $actionColumns = collect($this->columns)
-            ->filter(fn(Column $c) => $c instanceof ActionColumn && $c->hasActions())
+            ->filter(fn (Column $c) => $c instanceof ActionColumn && $c->hasActions())
             ->values()
             ->toArray();
 
         return collect($this->paginator->items())
             ->map(function ($item) use ($formatterColumns, $relationColumns, $actionColumns) {
-                $row = $item instanceof \Illuminate\Database\Eloquent\Model
+                $row = $item instanceof Model
                     ? $item->toArray()
                     : (array) $item;
 
-                if ($item instanceof \Illuminate\Database\Eloquent\Model) {
+                if ($item instanceof Model) {
                     foreach ($relationColumns as $column) {
                         $relationName = $column->getRelation();
                         $relationKey = $column->getRelationKey();
@@ -145,6 +145,7 @@ class TableResult implements \JsonSerializable
 
                         if (! $item->relationLoaded($relationName)) {
                             $row[$outputKey] = null;
+
                             continue;
                         }
 
@@ -178,7 +179,7 @@ class TableResult implements \JsonSerializable
     private function transformColumns(): array
     {
         return collect($this->columns)
-            ->map(fn(Column $c) => $c->toArray())
+            ->map(fn (Column $c) => $c->toArray())
             ->values()
             ->toArray();
     }
