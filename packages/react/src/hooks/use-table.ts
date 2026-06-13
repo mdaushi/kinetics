@@ -38,6 +38,7 @@ export function useTable<TData extends Record<string, unknown>>({
     meta,
     state: serverState,
     filters: serverFilters = [],
+    actions: serverActions = [],
   } = serverData;
 
   // Controller from core — all logic parameters are here
@@ -191,6 +192,7 @@ export function useTable<TData extends Record<string, unknown>>({
     setFilter: handleFilterChange,
     filters: serverState.filters,
     filtersConfig: serverFilters,
+    actions: serverActions,
     reset: handleReset,
   };
 }

@@ -48,6 +48,7 @@ export interface TableProps<TData = Record<string, unknown>> {
   data: TData[];
   columns: TableColumn[];
   filters?: TableFilter[];
+  actions?: ActionItem[];
   meta: TableMeta;
   state: TableState;
 }

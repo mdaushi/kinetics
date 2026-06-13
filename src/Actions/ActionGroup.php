@@ -51,7 +51,7 @@ class ActionGroup
     /**
      * Resolve group for one row — invisible filter action.
      */
-    public function resolve(array|object $row): array
+    public function resolve(array|object|null $row = null): array
     {
         $resolved = collect($this->actions)
             ->map(fn (Action $a) => $a->resolve($row))

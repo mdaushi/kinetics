@@ -118,7 +118,7 @@ function ActionButton({
       variant={action.variant}
     >
       {action.icon && <Icon name={action.icon} />}
-      <span className="sr-only sm:not-sr-only">{action.label}</span>
+      {action.label}
     </Button>
   );
 }

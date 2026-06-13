@@ -4,6 +4,7 @@ namespace Kinetics\Resources;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Kinetics\Actions\Action;
 use Kinetics\Columns\ActionColumn;
 use Kinetics\Columns\Column;
 use Kinetics\Support\TableContext;
@@ -34,6 +35,7 @@ class TableResult implements \JsonSerializable
             'data' => $this->getData(),
             'columns' => $this->getColumns(),
             'filters' => $this->context->getFiltersArray(),
+            'actions' => $this->getActions(),
             'meta' => $this->getMeta(),
             'state' => $this->getState(),
         ];
@@ -69,6 +71,29 @@ class TableResult implements \JsonSerializable
     public function getColumns(): array
     {
         return $this->transformColumns();
+    }
+
+    /**
+     * Global actions resolved for the frontend.
+     */
+    public function getActions(): array
+    {
+        return collect($this->context->actions)
+            ->map(function ($action) {
+                $resolved = $action->resolve(null);
+                if (empty($resolved) || (isset($resolved['actions']) && empty($resolved['actions']))) {
+                    return null;
+                }
+
+                if ($action instanceof Action) {
+                    return array_merge(['type' => 'action'], $resolved);
+                }
+
+                return $resolved;
+            })
+            ->filter()
+            ->values()
+            ->toArray();
     }
 
     /**

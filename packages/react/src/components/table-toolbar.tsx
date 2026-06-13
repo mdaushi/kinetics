@@ -1,10 +1,11 @@
 import * as React from "react";
-import { TableColumn, TableFilter } from "@mdaushi/kinetics-core";
+import { TableColumn, TableFilter, ActionItem } from "@mdaushi/kinetics-core";
 import { X } from "lucide-react";
 
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { AddFilterDropdown, ActiveFilterPills } from "./table-filters";
+import { ActionCell } from "./action-cell";
 
 interface TableToolbarProps {
   search: string;
@@ -16,6 +17,7 @@ interface TableToolbarProps {
   setFilter: (key: string, value: unknown) => void;
   reset: () => void;
   debounce?: number;
+  actions?: ActionItem[];
 }
 export default function TableToolbar({
   search,
@@ -27,6 +29,7 @@ export default function TableToolbar({
   setFilter,
   reset,
   debounce,
+  actions = [],
 }: TableToolbarProps) {
   const [draftFilters, setDraftFilters] = React.useState<string[]>([]);
 
@@ -36,39 +39,47 @@ export default function TableToolbar({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-1 items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto flex-1">
           {hasSearch && (
             <Input
               placeholder={placeholder}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-8 w-[150px] lg:w-[250px]"
+              className="h-8 w-full sm:w-[150px] lg:w-[250px]"
             />
           )}
 
-          <AddFilterDropdown
-            filters={filtersConfig}
-            activeFilters={filters}
-            draftFilters={draftFilters}
-            onAddDraft={(name) => setDraftFilters((prev) => [...prev, name])}
-            setFilter={setFilter}
-          />
+          <div className="flex items-center gap-2">
+            <AddFilterDropdown
+              filters={filtersConfig}
+              activeFilters={filters}
+              draftFilters={draftFilters}
+              onAddDraft={(name) => setDraftFilters((prev) => [...prev, name])}
+              setFilter={setFilter}
+            />
 
-          {hasFilter && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setDraftFilters([]);
-                reset();
-              }}
-              className="h-8 px-2 lg:px-3"
-            >
-              Reset
-              <X className="ml-2 h-4 w-4" />
-            </Button>
-          )}
+            {hasFilter && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setDraftFilters([]);
+                  reset();
+                }}
+                className="h-8 px-2 lg:px-3"
+              >
+                Reset
+                <X className="ml-2 h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
+
+        {actions.length > 0 && (
+          <div className="hidden md:flex flex-wrap items-center gap-2 justify-end shrink-0">
+            <ActionCell actions={actions} />
+          </div>
+        )}
       </div>
 
       {(hasFilter || draftFilters.length > 0) && (
@@ -82,6 +93,12 @@ export default function TableToolbar({
           setFilter={setFilter}
           debounce={debounce}
         />
+      )}
+
+      {actions.length > 0 && (
+        <div className="flex md:hidden flex-wrap items-center gap-2 justify-end mt-1 w-full">
+          <ActionCell actions={actions} />
+        </div>
       )}
     </div>
   );

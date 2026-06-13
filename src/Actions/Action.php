@@ -222,9 +222,9 @@ class Action
     /**
      * Resolve action for one row — evaluate all closures.
      */
-    public function resolve(array|object $row): array
+    public function resolve(array|object|null $row = null): array
     {
-        $rowArr = is_array($row) ? $row : (array) $row;
+        $rowArr = $row ? (is_array($row) ? $row : (array) $row) : [];
 
         $isVisible = $this->visibleWhen ? ($this->visibleWhen)($row) : true;
         $isDisabled = $this->disabledWhen ? ($this->disabledWhen)($row) : false;
@@ -252,7 +252,7 @@ class Action
 
     // Internals
 
-    private function resolveHref(array|object $row): ?string
+    private function resolveHref(array|object|null $row = null): ?string
     {
         if (! $this->href) {
             return null;
@@ -262,7 +262,7 @@ class Action
             return ($this->href)($row);
         }
 
-        $rowArr = is_array($row) ? $row : (array) $row;
+        $rowArr = $row ? (is_array($row) ? $row : (array) $row) : [];
 
         try {
             $route = app('router')->getRoutes()->getByName($this->href);

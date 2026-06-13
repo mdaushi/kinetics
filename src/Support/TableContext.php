@@ -29,6 +29,7 @@ class TableContext
         public readonly TableConfig $config,
         array $columns,
         array $filters = [],
+        public readonly array $actions = [],
     ) {
         $this->columns = $columns;
         $this->filters = $filters;

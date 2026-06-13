@@ -31,6 +31,8 @@ class Table
     /** @var FilterInterface[] */
     private array $filters = [];
 
+    private array $actions = [];
+
     /** @var class-string<PipeInterface>[]|PipeInterface[] */
     private array $extraPipes = [];
 
@@ -85,6 +87,16 @@ class Table
     public function columns(array $columns): static
     {
         $this->columns = $columns;
+
+        return $this;
+    }
+
+    /**
+     * Define global actions.
+     */
+    public function actions(array $actions): static
+    {
+        $this->actions = $actions;
 
         return $this;
     }
@@ -274,6 +286,7 @@ class Table
             config: $this->config,
             columns: $this->columns,
             filters: $this->filters,
+            actions: $this->actions,
         );
 
         $context->setMeta('debounce', $this->debounce);
