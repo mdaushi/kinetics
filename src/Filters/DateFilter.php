@@ -38,12 +38,10 @@ class DateFilter extends Filter
             return;
         }
 
-        $column = $query->qualifyColumn($this->getColumn());
-
         if ($this->isRange && $operator !== 'between') {
             $operator = 'between';
         }
 
-        $this->applyOperator($query, $column, $operator, $value);
+        $this->resolveAndApplyOperator($query, $operator, $value);
     }
 }

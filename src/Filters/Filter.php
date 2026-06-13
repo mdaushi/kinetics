@@ -20,6 +20,10 @@ abstract class Filter implements FilterInterface
 
     protected array $meta = [];
 
+    protected ?string $relation = null;
+
+    protected ?string $relationKey = null;
+
     protected static array $customResolvers = [];
 
     protected function __construct(string $key)
@@ -100,6 +104,47 @@ abstract class Filter implements FilterInterface
         }
 
         return [$operator, $value];
+    }
+
+    public function apply(Builder $query, mixed $payload): void
+    {
+        [$operator, $value] = $this->parsePayload($payload);
+
+        if ($value === null || $value === '') {
+            return;
+        }
+
+        $this->resolveAndApplyOperator($query, $operator, $value);
+    }
+
+    /**
+     * Resolves the column name and applies the operator.
+     * Automatically handles relationship columns (e.g., 'author.name') via whereHas.
+     */
+    protected function resolveAndApplyOperator(Builder $query, string $operator, mixed $value): void
+    {
+        $column = $this->getColumn();
+
+        if ($this->relation !== null && $this->relationKey !== null) {
+            $query->whereHas($this->relation, function (Builder $q) use ($operator, $value) {
+                $this->applyOperator($q, $q->qualifyColumn($this->relationKey), $operator, $value);
+            });
+
+            return;
+        }
+
+        if (str_contains($column, '.')) {
+            [$relation, $relationColumn] = explode('.', $column, 2);
+
+            $query->whereHas($relation, function (Builder $q) use ($relationColumn, $operator, $value) {
+                // Recursively qualify the column within the context of the related table
+                $this->applyOperator($q, $q->qualifyColumn($relationColumn), $operator, $value);
+            });
+
+            return;
+        }
+
+        $this->applyOperator($query, $query->qualifyColumn($column), $operator, $value);
     }
 
     /**
@@ -196,6 +241,19 @@ abstract class Filter implements FilterInterface
     public function column(string $column): static
     {
         $this->column = $column;
+
+        return $this;
+    }
+
+    /**
+     * Explicitly set the relation for this filter.
+     * Useful when you want a custom key for the filter (e.g. 'author_name_filter')
+     * but still want to query a relationship (e.g. 'author.name').
+     */
+    public function relation(string $relation, string $relationKey): static
+    {
+        $this->relation = $relation;
+        $this->relationKey = $relationKey;
 
         return $this;
     }

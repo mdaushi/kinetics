@@ -39,8 +39,6 @@ class SelectFilter extends Filter
             return;
         }
 
-        $column = $query->qualifyColumn($this->getColumn());
-
         if (is_array($value)) {
             $value = array_filter($value, fn ($v) => $v !== null && $v !== '');
             if (empty($value)) {
@@ -48,6 +46,6 @@ class SelectFilter extends Filter
             }
         }
 
-        $this->applyOperator($query, $column, $operator, $value);
+        $this->resolveAndApplyOperator($query, $operator, $value);
     }
 }

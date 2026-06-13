@@ -11,7 +11,10 @@ use Kinetics\Actions\Action;
 use Kinetics\Actions\ActionGroup;
 use Kinetics\Columns\ActionColumn;
 use Kinetics\Columns\TextColumn;
+use Kinetics\Filters\DateFilter;
+use Kinetics\Filters\NumberFilter;
 use Kinetics\Filters\SelectFilter;
+use Kinetics\Filters\TextFilter;
 use Kinetics\Pipes\DateRangeFilterPipe;
 use Kinetics\Resources\TableResult;
 use Kinetics\Table;
@@ -485,6 +488,82 @@ class TableAdvancedTest extends TestCase
         // Data masih ada (hidden hanya flag untuk FE), tapi visible = false
         $this->assertContains('views', $colKeys);
         $this->assertCount(1, $visible); // hanya 'title' yang visible
+    }
+
+    // Relation Filters
+
+    public function test_text_filter_relation_dot_notation(): void
+    {
+        $request = new Request([
+            'filters' => ['category.name' => ['operator' => 'equals', 'value' => 'Vue']],
+        ]);
+
+        $result = Table::model(PostModel::class)
+            ->columns([TextColumn::make('title')])
+            ->filters([
+                TextFilter::make('category.name'),
+            ])
+            ->withRequest($request)
+            ->make();
+
+        $this->assertCount(1, $result['data']);
+        $this->assertEquals('Vue Composables', $result['data'][0]['title']);
+    }
+
+    public function test_select_filter_relation_explicit_method(): void
+    {
+        $request = new Request([
+            'filters' => ['cat_filter' => ['operator' => 'is', 'value' => ['Laravel']]],
+        ]);
+
+        $result = Table::model(PostModel::class)
+            ->columns([TextColumn::make('title')])
+            ->filters([
+                SelectFilter::make('cat_filter')->relation('category', 'name'),
+            ])
+            ->withRequest($request)
+            ->make();
+
+        $this->assertCount(2, $result['data']); // Intro to Laravel, Advanced Eloquent
+    }
+
+    public function test_number_filter_relation_dot_notation(): void
+    {
+        // Vue Composables uses category B which is ID 2
+        $request = new Request([
+            'filters' => ['category.id' => ['operator' => '>', 'value' => 1]],
+        ]);
+
+        $result = Table::model(PostModel::class)
+            ->columns([TextColumn::make('title')])
+            ->filters([
+                NumberFilter::make('category.id'),
+            ])
+            ->withRequest($request)
+            ->make();
+
+        $this->assertCount(1, $result['data']);
+        $this->assertEquals('Vue Composables', $result['data'][0]['title']);
+    }
+
+    public function test_date_filter_relation_explicit_method(): void
+    {
+        $catA = PostCategory::first();
+
+        $request = new Request([
+            'filters' => ['cat_created' => ['operator' => 'equals', 'value' => $catA->created_at->format('Y-m-d')]],
+        ]);
+
+        $result = Table::model(PostModel::class)
+            ->columns([TextColumn::make('title')])
+            ->filters([
+                DateFilter::make('cat_created')->relation('category', 'created_at'),
+            ])
+            ->withRequest($request)
+            ->make();
+
+        // Both categories are created today, so all 3 posts match
+        $this->assertCount(3, $result['data']);
     }
 }
 
