@@ -32,11 +32,16 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install JS dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       # Menggunakan --recursive agar pnpm otomatis mengurutkan build dari core ke react
       - name: Build packages
         run: pnpm -r run build
+
+      - name: Publish packages to npm
+        run: pnpm -r publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -44,7 +49,3 @@ jobs:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
 
-      - name: Publish packages to npm
-        run: pnpm -r publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
