@@ -24,7 +24,7 @@ class DateRangeFilterPipe implements PipeInterface
 
     public function handle(Builder $query, Closure $next): mixed
     {
-        $ctx = $query->getModel()->datatableContext ?? null;
+        $ctx = TableContext::getForQuery($query);
         $request = $ctx instanceof TableContext ? $ctx->request : request();
 
         $from = $request->get($this->fromParam);

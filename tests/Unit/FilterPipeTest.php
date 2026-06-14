@@ -43,9 +43,7 @@ class FilterPipeTest extends TestCase
             TextFilter::make('name'),
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new FilterPipe;
         $pipe->handle($this->query, fn ($q) => $q);
@@ -63,9 +61,7 @@ class FilterPipeTest extends TestCase
             TextFilter::make('name'), // Only name is registered
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new FilterPipe;
         $pipe->handle($this->query, fn ($q) => $q);

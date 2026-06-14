@@ -44,9 +44,7 @@ class SortPipeTest extends TestCase
         ]);
 
         // Attach context to model
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new SortPipe;
         $pipe->handle($this->query, fn ($q) => $q);
@@ -62,9 +60,7 @@ class SortPipeTest extends TestCase
             TextColumn::make('email'), // Not sortable
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new SortPipe;
         $pipe->handle($this->query, fn ($q) => $q);
@@ -81,9 +77,7 @@ class SortPipeTest extends TestCase
             TextColumn::make('email'), // Not sortable
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new SortPipe;
         $pipe->handle($this->query, fn ($q) => $q);
@@ -100,9 +94,7 @@ class SortPipeTest extends TestCase
             TextColumn::make('category.name')->sortable(),
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new SortPipe;
         $pipe->handle($this->query, fn ($q) => $q);

@@ -273,7 +273,7 @@ class Table
 
     /**
      * Create a TableContext and "pass" it to the model
-     * so that it can be retrieved by pipes via $query->getModel()->datatableContext.
+     * so that it can be retrieved by pipes via TableContext::getForQuery($query).
      *
      * This is the cleanest way to pass context to pipes
      * without having to change the signature of Pipeline::send().

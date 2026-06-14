@@ -25,7 +25,7 @@ class CursorPaginatePipe implements PipeInterface
 {
     public function handle(Builder $query, Closure $next): CursorPaginator
     {
-        $ctx = $query->getModel()->datatableContext ?? null;
+        $ctx = TableContext::getForQuery($query);
 
         $perPage = $ctx instanceof TableContext
             ? $ctx->getPerPage()

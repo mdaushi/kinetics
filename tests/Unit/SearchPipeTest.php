@@ -44,9 +44,7 @@ class SearchPipeTest extends TestCase
             TextColumn::make('email'), // Not searchable
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new SearchPipe;
         $pipe->handle($this->query, fn ($q) => $q);
@@ -65,9 +63,7 @@ class SearchPipeTest extends TestCase
             TextColumn::make('category.name')->searchable(),
         ]);
 
-        $model = new TestUser;
-        $model->datatableContext = $context;
-        $this->query = $model->newModelQuery();
+        TableContext::setForQuery($this->query, $context);
 
         $pipe = new SearchPipe;
         $pipe->handle($this->query, fn ($q) => $q);
