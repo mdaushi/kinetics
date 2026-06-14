@@ -70,6 +70,14 @@ abstract class Filter implements FilterInterface
     }
 
     /**
+     * Clear all custom resolvers (useful for testing).
+     */
+    public static function clearResolvers(): void
+    {
+        static::$customResolvers = [];
+    }
+
+    /**
      * Get a simple array of allowed operator keys.
      */
     public function getAllowedOperators(): array
@@ -169,16 +177,7 @@ abstract class Filter implements FilterInterface
     protected function applyDateOperator(Builder $query, string $column, string $operator, mixed $value): void
     {
         if ($operator === 'between') {
-            if (is_array($value) && count($value) === 2 && ! empty($value[0]) && ! empty($value[1])) {
-                $query->whereBetween($column, [
-                    Carbon::parse($value[0])->startOfDay(),
-                    Carbon::parse($value[1])->endOfDay(),
-                ]);
-            } elseif (is_array($value) && count($value) === 2 && ! empty($value[0])) {
-                $query->whereDate($column, '>=', Carbon::parse($value[0])->startOfDay());
-            } elseif (is_array($value) && count($value) === 2 && ! empty($value[1])) {
-                $query->whereDate($column, '<=', Carbon::parse($value[1])->endOfDay());
-            }
+            $this->applyDateBetweenOperator($query, $column, $value);
 
             return;
         }
@@ -196,18 +195,28 @@ abstract class Filter implements FilterInterface
         };
     }
 
+    private function applyDateBetweenOperator(Builder $query, string $column, mixed $value): void
+    {
+        if (! is_array($value) || count($value) !== 2) {
+            return;
+        }
+
+        $from = ! empty($value[0]) ? Carbon::parse($value[0])->startOfDay() : null;
+        $to = ! empty($value[1]) ? Carbon::parse($value[1])->endOfDay() : null;
+
+        if ($from && $to) {
+            $query->whereBetween($column, [$from, $to]);
+        } elseif ($from) {
+            $query->whereDate($column, '>=', $from);
+        } elseif ($to) {
+            $query->whereDate($column, '<=', $to);
+        }
+    }
+
     protected function applyStandardOperator(Builder $query, string $column, string $operator, mixed $value): void
     {
         if ($operator === 'between') {
-            if (is_array($value) && count($value) === 2 && $value[0] !== null && $value[0] !== '' && $value[1] !== null && $value[1] !== '') {
-                $query->whereBetween($column, $value);
-            } elseif (is_array($value) && count($value) === 2 && $value[0] !== null && $value[0] !== '') {
-                $query->where($column, '>=', $value[0]);
-            } elseif (is_array($value) && count($value) === 2 && $value[1] !== null && $value[1] !== '') {
-                $query->where($column, '<=', $value[1]);
-            } elseif (! is_array($value) && $value !== null && $value !== '') {
-                $query->where($column, '>=', $value);
-            }
+            $this->applyBetweenOperator($query, $column, $value);
 
             return;
         }
@@ -229,6 +238,29 @@ abstract class Filter implements FilterInterface
                     'Please register it using Filter::resolveOperator().'
             ),
         };
+    }
+
+    private function applyBetweenOperator(Builder $query, string $column, mixed $value): void
+    {
+        if (! is_array($value) || count($value) !== 2) {
+            if ($value !== null && $value !== '') {
+                $query->where($column, '>=', $value);
+            }
+
+            return;
+        }
+
+        [$from, $to] = $value;
+        $hasFrom = $from !== null && $from !== '';
+        $hasTo = $to !== null && $to !== '';
+
+        if ($hasFrom && $hasTo) {
+            $query->whereBetween($column, [$from, $to]);
+        } elseif ($hasFrom) {
+            $query->where($column, '>=', $from);
+        } elseif ($hasTo) {
+            $query->where($column, '<=', $to);
+        }
     }
 
     public function label(string $label): static

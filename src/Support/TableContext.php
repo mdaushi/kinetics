@@ -148,4 +148,28 @@ class TableContext
     {
         return $this->meta;
     }
+
+    // Context Manager
+
+    public static function setForQuery(Builder $query, self $context): void
+    {
+        app()->instance(self::getContainerKey($query), $context);
+    }
+
+    public static function getForQuery(Builder $query): ?self
+    {
+        $key = self::getContainerKey($query);
+
+        return app()->bound($key) ? app($key) : null;
+    }
+
+    public static function forgetForQuery(Builder $query): void
+    {
+        app()->forgetInstance(self::getContainerKey($query));
+    }
+
+    private static function getContainerKey(Builder $query): string
+    {
+        return 'kinetics.context.'.spl_object_id($query);
+    }
 }

@@ -16,7 +16,7 @@ class PaginatePipe implements PipeInterface
 {
     public function handle(Builder $query, Closure $next): LengthAwarePaginator
     {
-        $ctx = $query->getModel()->datatableContext ?? null;
+        $ctx = TableContext::getForQuery($query);
 
         $perPage = $ctx instanceof TableContext
             ? $ctx->getPerPage()
@@ -33,6 +33,8 @@ class PaginatePipe implements PipeInterface
                 $paginator->getCollection()->loadMissing($relations);
             }
         }
+
+        TableContext::forgetForQuery($query);
 
         return $paginator;
     }

@@ -2,6 +2,8 @@
 
 namespace Kinetics\Actions;
 
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+
 /**
  * Represents a single action (button/link) in the action column.
  *
@@ -224,7 +226,7 @@ class Action
      */
     public function resolve(array|object|null $row = null): array
     {
-        $rowArr = $row ? (is_array($row) ? $row : (array) $row) : [];
+        $rowArr = $this->normalizeRow($row);
 
         $isVisible = $this->visibleWhen ? ($this->visibleWhen)($row) : true;
         $isDisabled = $this->disabledWhen ? ($this->disabledWhen)($row) : false;
@@ -262,7 +264,7 @@ class Action
             return ($this->href)($row);
         }
 
-        $rowArr = $row ? (is_array($row) ? $row : (array) $row) : [];
+        $rowArr = $this->normalizeRow($row);
 
         try {
             $route = app('router')->getRoutes()->getByName($this->href);
@@ -280,10 +282,21 @@ class Action
                 return route($this->href, $params);
             }
 
-            return route($this->href, $row);
-        } catch (\Throwable $e) {
+            return route($this->href, $rowArr);
+        } catch (RouteNotFoundException $e) {
             // Fallback to raw string if it's a URL or invalid route
             return $this->href;
+        } catch (\InvalidArgumentException $e) {
+            return $this->href;
         }
+    }
+
+    private function normalizeRow(array|object|null $row): array
+    {
+        if ($row === null) {
+            return [];
+        }
+
+        return is_array($row) ? $row : (array) $row;
     }
 }

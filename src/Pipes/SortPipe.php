@@ -21,7 +21,7 @@ class SortPipe implements PipeInterface
 
     public function handle(Builder $query, Closure $next): mixed
     {
-        $ctx = $query->getModel()->datatableContext ?? null;
+        $ctx = TableContext::getForQuery($query);
 
         if (! $ctx instanceof TableContext) {
             return $next($query);

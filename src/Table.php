@@ -291,8 +291,7 @@ class Table
 
         $context->setMeta('debounce', $this->debounce);
 
-        // Titipkan context ke model — diambil oleh pipes
-        $this->query->getModel()->datatableContext = $context;
+        TableContext::setForQuery($this->query, $context);
 
         return $context;
     }
@@ -327,7 +326,9 @@ class Table
 
         // Custom pipes — setelah sort/search/filter, sebelum paginate
         foreach ($this->extraPipes as $pipe) {
-            if (! in_array(is_string($pipe) ? $pipe : get_class($pipe), $this->removedPipes)) {
+            $pipeClass = is_string($pipe) ? $pipe : get_class($pipe);
+
+            if (! in_array($pipeClass, $this->removedPipes)) {
                 $pipes[] = $pipe;
             }
         }

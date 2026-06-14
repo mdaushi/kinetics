@@ -31,6 +31,8 @@ class SearchPipe implements PipeInterface
             foreach ($columns as $column) {
                 if ($relation = $column->getRelation()) {
                     // Try to apply JOIN instead of whereHas
+                    // Note: We use the outer $query here, not the inner $q, because
+                    // JOINs must be applied to the main query builder, not the nested where clause.
                     if ($this->joinRelationIfNeeded($query, $column)) {
                         $model = $query->getModel();
                         $relationInstance = $model->{$relation}();
@@ -58,6 +60,6 @@ class SearchPipe implements PipeInterface
 
     private function getContext(Builder $query): ?TableContext
     {
-        return $query->getModel()->datatableContext ?? null;
+        return TableContext::getForQuery($query);
     }
 }
