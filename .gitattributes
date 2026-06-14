@@ -1,3 +1,10 @@
+* text=auto eol=lf
+*.php text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
 
 /packages export-ignore
 /tests export-ignore

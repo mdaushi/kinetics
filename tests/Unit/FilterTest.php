@@ -2,6 +2,7 @@
 
 namespace Kinetics\Tests\Unit;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Kinetics\Filters\Filter;
@@ -13,7 +14,7 @@ class DummyFilter extends Filter
 
     protected array $operators = ['equals', 'contains'];
 
-    public function apply(\Illuminate\Database\Eloquent\Builder $query, mixed $payload): void
+    public function apply(Builder $query, mixed $payload): void
     {
         [$operator, $value] = $this->parsePayload($payload);
         $this->applyOperator($query, $this->getColumn(), $operator, $value);

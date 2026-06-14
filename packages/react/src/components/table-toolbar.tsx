@@ -19,7 +19,7 @@ interface TableToolbarProps {
   debounce?: number;
   actions?: ActionItem[];
 }
-export default function TableToolbar({
+export function TableToolbar({
   search,
   columns,
   setSearch,

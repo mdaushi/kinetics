@@ -21,7 +21,7 @@ interface TablePaginationProps<TData> {
   table: Table<TData>;
 }
 
-export default function TablePagination<TData>({
+export function TablePagination<TData>({
   meta,
   table,
 }: TablePaginationProps<TData>) {
@@ -47,11 +47,13 @@ export default function TablePagination<TData>({
               <SelectValue placeholder={meta.per_page} />
             </SelectTrigger>
             <SelectContent side="left" align="end">
-              {(meta.options_per_page ?? [10, 15, 25, 50, 100]).map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
-                </SelectItem>
-              ))}
+              {(meta.options_per_page ?? [10, 15, 25, 50, 100]).map(
+                (pageSize) => (
+                  <SelectItem key={pageSize} value={`${pageSize}`}>
+                    {pageSize}
+                  </SelectItem>
+                ),
+              )}
             </SelectContent>
           </Select>
         </div>

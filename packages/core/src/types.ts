@@ -29,6 +29,7 @@ export interface TableMeta {
   current_page: number;
   last_page: number;
   per_page: number;
+  default_per_page: number;
   total: number;
   from: number | null;
   to: number | null;

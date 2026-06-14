@@ -1,182 +1,60 @@
-import { router } from "@inertiajs/react";
+import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import {
-  ColumnDef,
-  getCoreRowModel,
-  useReactTable,
-  SortingState,
-  PaginationState,
-} from "@tanstack/react-table";
-import React, { useCallback, useMemo, useState } from "react";
-import { useDebouncedCallback } from "use-debounce";
-import {
-  ActionItem,
   TableColumn,
   TableMeta,
   TableState,
-  TableController,
   TableProps,
 } from "@mdaushi/kinetics-core";
-import { ActionCell } from "../components/action-cell";
-import { TableColumnHeader } from "../components/table-column-header";
-import { Badge } from "../components/ui/badge";
-import { cleanQueryParams } from "../lib/utils";
+import { useTableProps } from "./use-table-props";
+import { useTableColumns } from "./use-table-columns";
+import { useTableNavigation } from "./use-table-navigation";
+import { useTableFilters } from "./use-table-filters";
+import { useTableRouter } from "./use-table-router";
 
 export type { TableProps, TableColumn, TableMeta, TableState };
 
-export interface UseTableOptions<TData> {
-  table: TableProps<TData>;
+export interface UseTableOptions {
   url?: string;
 }
 
-export function useTable<TData extends Record<string, unknown>>({
-  table: serverData,
-  url,
-}: UseTableOptions<TData>) {
+export {
+  useTableProps,
+  useTableColumns,
+  useTableNavigation,
+  useTableFilters,
+  useTableRouter,
+};
+
+export function useTable<TData extends Record<string, unknown>>(
+  propName: string = "table",
+  options?: UseTableOptions,
+) {
+  const url = options?.url;
+
   const {
     data,
-    columns: serverColumns,
     meta,
-    state: serverState,
-    filters: serverFilters = [],
     actions: serverActions = [],
-  } = serverData;
+  } = useTableProps<TData>(propName, url);
 
-  // Controller from core — all logic parameters are here
-  const ctrl = useMemo(
-    () => new TableController(serverState, meta),
-    [serverState, meta, url],
-  );
-
-  const [search, setSearchLocal] = useState(serverState.search ?? "");
-
-  const visit = useCallback(
-    (params: Record<string, unknown>) => {
-      const cleanParams = cleanQueryParams(params, meta.per_page);
-
-      router.get(url ?? window.location.pathname, cleanParams, {
-        preserveState: true,
-        preserveScroll: true,
-        replace: true,
-      });
-    },
-    [url],
-  );
-
-  // Handlers
-
-  const handleSortChange = useCallback(
-    (updater: SortingState | ((prev: SortingState) => SortingState)) => {
-      const current = ctrl.toSorting();
-      const next = typeof updater === "function" ? updater(current) : updater;
-      visit(ctrl.resolveSort(next));
-    },
-    [ctrl, visit],
-  );
-
-  const handlePageChange = useCallback(
-    (
-      updater: PaginationState | ((prev: PaginationState) => PaginationState),
-    ) => {
-      const current = ctrl.toPagination();
-      const next = typeof updater === "function" ? updater(current) : updater;
-      visit(ctrl.resolvePagination(next));
-    },
-    [ctrl, visit],
-  );
-
-  const handleSearchChange = useDebouncedCallback((value: string) => {
-    visit(ctrl.resolveSearchParams(value));
-  }, meta.debounce);
-
-  const handleFilterChange = useCallback(
-    (key: string, value: unknown) => {
-      visit(ctrl.resolveFilterParams(key, value));
-    },
-    [ctrl, visit],
-  );
-
-  const handleReset = useCallback(() => {
-    setSearchLocal("");
-    visit(ctrl.resolveReset());
-  }, [ctrl, visit]);
-
-  // Build TanStack column defs from server column definitions
-
-  const columnDefs = useMemo<ColumnDef<TData>[]>(() => {
-    return serverColumns
-      .filter((col) => col.visible)
-      .map((col): ColumnDef<TData> => {
-        // Action column — auto-inject ActionCell
-        if (col.type === "actions") {
-          return {
-            id: col.key,
-            accessorKey: col.key,
-            header: col.label,
-            enableSorting: false,
-            cell: ({ getValue }) =>
-              React.createElement(ActionCell, {
-                actions: (getValue() as ActionItem[]) ?? [],
-              }),
-          };
-        }
-
-        return {
-          id: col.key,
-          accessorKey: col.key,
-          header: ({ column }) =>
-            React.createElement(TableColumnHeader, {
-              column: column,
-              title: col.label,
-            } as any),
-          enableSorting: col.sortable,
-          cell: ({ getValue }) => {
-            const value = getValue();
-            if (col.type === "badge") {
-              const colorMeta = col.meta?.color;
-              let finalColor = "default";
-
-              if (typeof colorMeta === "string") {
-                finalColor = colorMeta;
-              } else if (typeof colorMeta === "object" && colorMeta !== null) {
-                finalColor =
-                  (colorMeta as Record<string, string>)[String(value)] ??
-                  "default";
-              }
-
-              return React.createElement(
-                Badge,
-                {
-                  variant: finalColor as React.ComponentProps<
-                    typeof Badge
-                  >["variant"],
-                },
-                String(value),
-              );
-            }
-
-            const formatted = value ? String(value) : null;
-
-            return formatted;
-          },
-        };
-      });
-  }, [serverColumns]);
+  const { columnDefs, serverColumns } = useTableColumns<TData>(propName, url);
+  const nav = useTableNavigation<TData>(propName, url);
+  const filterParams = useTableFilters<TData>(propName, url);
 
   // TanStack Table instance
-
   const tableInstance = useReactTable<TData>({
     data,
     columns: columnDefs,
     state: {
-      sorting: ctrl.toSorting(),
-      pagination: ctrl.toPagination(),
+      sorting: nav.ctrl.toSorting(),
+      pagination: nav.ctrl.toPagination(),
     },
     manualSorting: true,
     manualPagination: true,
     manualFiltering: true,
     pageCount: meta.last_page,
-    onSortingChange: handleSortChange,
-    onPaginationChange: handlePageChange,
+    onSortingChange: nav.handleSortChange,
+    onPaginationChange: nav.handlePageChange,
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -184,15 +62,12 @@ export function useTable<TData extends Record<string, unknown>>({
     tableInstance,
     columns: serverColumns,
     meta,
-    search,
-    setSearch: (value: string) => {
-      setSearchLocal(value);
-      handleSearchChange(value);
-    },
-    setFilter: handleFilterChange,
-    filters: serverState.filters,
-    filtersConfig: serverFilters,
+    search: filterParams.search,
+    setSearch: filterParams.setSearch,
+    setFilter: filterParams.setFilter,
+    filters: filterParams.filters,
+    filtersConfig: filterParams.filtersConfig,
     actions: serverActions,
-    reset: handleReset,
+    reset: filterParams.reset,
   };
 }

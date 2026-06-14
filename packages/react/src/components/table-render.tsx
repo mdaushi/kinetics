@@ -12,7 +12,7 @@ interface RenderTableProps<TData> {
   table: TableInstance<TData>;
 }
 
-export default function RenderTable<TData>({ table }: RenderTableProps<TData>) {
+export function RenderTable<TData>({ table }: RenderTableProps<TData>) {
   return (
     <div className="overflow-hidden rounded-md border">
       <Table>

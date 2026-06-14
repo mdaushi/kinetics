@@ -1,17 +1,17 @@
-import { TableProps, useTable } from "../hooks/use-table";
-import TablePagination from "./table-pagination";
-import TableToolbar from "./table-toolbar";
-import RenderTable from "./table-render";
+import { useTable } from "../hooks/use-table";
+import { TablePagination } from "./table-pagination";
+import { TableToolbar } from "./table-toolbar";
+import { RenderTable } from "./table-render";
 
-interface TableComponentProps<TData extends Record<string, unknown>> {
-  table: TableProps<TData>;
+interface TableComponentProps {
+  table: string;
   searchPlaceholder?: string;
 }
 
 export function Table<TData extends Record<string, unknown>>({
-  table: serverData,
+  table,
   searchPlaceholder = "Search...",
-}: TableComponentProps<TData>) {
+}: TableComponentProps) {
   const {
     tableInstance,
     columns: serverColumns,
@@ -23,7 +23,7 @@ export function Table<TData extends Record<string, unknown>>({
     filtersConfig,
     actions,
     reset,
-  } = useTable({ table: serverData });
+  } = useTable<TData>(table);
 
   return (
     <div className="space-y-3">

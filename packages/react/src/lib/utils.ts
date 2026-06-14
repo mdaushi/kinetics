@@ -18,6 +18,9 @@ export function cleanQueryParams(
     if (key === "page" && value === 1) continue;
     if (key === "per_page" && value === defaultPerPage) continue;
 
+    // Omit default sort direction
+    if (key === "direction" && value === "asc") continue;
+
     if (typeof value === "object" && !Array.isArray(value)) {
       const cleanNested = Object.fromEntries(
         Object.entries(value as Record<string, unknown>).filter(
