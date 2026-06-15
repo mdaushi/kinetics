@@ -56,7 +56,7 @@
   "peerDependencies": {
     "@inertiajs/react": "^3.2.0",
     "@tanstack/react-table": "^8.0",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^0.475.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
