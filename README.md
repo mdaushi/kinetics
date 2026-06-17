@@ -11,13 +11,13 @@
 
 Kinetics follows a simple philosophy: **Laravel is the brain**. All sorting, searching, filtering, and pagination logic lives on the server. The frontend is a pure renderer.
 
-[Documentation](#documentation) · [Quick Start](#installation) · [Roadmap](#roadmap) · [Contributing](#contributing)
+[Demo](https://kinetics-demo.mdaushi.com/) · [Documentation](#documentation) · [Quick Start](#installation) · [Roadmap](#roadmap) · [Contributing](#contributing)
 
 </div>
 
 ---
 
-![Kinetics Demo](./docs/kinetics-preview.gif)
+![Kinetics Demo](./assets/kinetics-preview.gif)
 
 ---
 

@@ -1,0 +1,36 @@
+---
+title: Kinetics Datatable
+description: The ultimate headless datatable component for Laravel and Inertia.js.
+template: splash
+hero:
+  title: Zero-Friction Tables for Laravel & Inertia
+  tagline: Stop writing boilerplate datatable components. Kinetics handles sorting, searching, filtering, and pagination natively on the server, while delivering a beautiful, ready-to-use React UI.
+  actions:
+    - text: Quick Start
+      link: /getting-started/quick-start/
+      icon: right-arrow
+      variant: primary
+    - text: Read the Documentation
+      link: /table/overview/
+      icon: document
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why Kinetics?
+
+<CardGrid stagger>
+	<Card title="Server-Side First" icon="rocket">
+		The heavy lifting is done by Laravel. Sort, search, filter, and paginate are fully handled natively by Eloquent, so your browser stays lightning fast.
+	</Card>
+	<Card title="Zero-Boilerplate React" icon="document">
+		Stop copy-pasting massive table components. Just drop `<Table table="data" />` into your Inertia page and watch the magic happen.
+	</Card>
+	<Card title="Fully Composable Pipeline" icon="setting">
+		Kinetics uses Laravel's native Pipeline architecture. You can easily modify, inject, or remove query stages according to your specific business logic.
+	</Card>
+	<Card title="Beautiful by Default" icon="open-book">
+		We don't do ugly. The frontend component is a modern, accessible, and responsive interface integrated deeply with `shadcn/ui` and Tailwind CSS.
+	</Card>
+</CardGrid>
