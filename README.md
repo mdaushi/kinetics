@@ -9,7 +9,7 @@
 [![Tests](https://img.shields.io/github/actions/workflow/status/mdaushi/kinetics/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/mdaushi/kinetics/actions/workflows/tests.yml)
 [![License](https://img.shields.io/packagist/l/mdaushi/kinetics.svg?style=flat-square)](https://packagist.org/packages/mdaushi/kinetics)
 
-Kinetics follows a simple philosophy: **Laravel is the brain**. All sorting, searching, filtering, and pagination logic lives on the server. The frontend is a pure renderer.
+Kinetics follows a simple philosophy: **Server-Side First, Zero-Boilerplate React**. All sorting, searching, filtering, and pagination logic runs natively through Laravel's Eloquent. The frontend is a pure renderer seamlessly integrated with Tailwind CSS and `shadcn/ui`.
 
 [Demo](https://kinetics-demo.mdaushi.com/) · [Documentation](#documentation) · [Quick Start](#installation) · [Roadmap](#roadmap) · [Contributing](#contributing)
 
@@ -134,12 +134,11 @@ export default function Post() {
 
 ## Documentation
 
-| Guide                                          | Description                                             |
-| ---------------------------------------------- | ------------------------------------------------------- |
-| [Backend (Laravel)](./docs/laravel-backend.md) | Columns, actions, pipes, full API reference             |
-| [Frontend (React)](./docs/react-frontend.md)   | `<Table />` component and `useTable` hook               |
-| [Custom Pipes](./docs/custom-pipes.md)         | Creating custom pipes + built-in pipe reference         |
-| [Architecture](./docs/architecture.md)         | Internal design: pipelines, contexts, response builders |
+Kinetics features a comprehensive documentation site. It covers everything from basic installation to advanced backend APIs (Columns, Filters, Actions) and pipeline customizations.
+
+📚 **[Read the Official Documentation](https://kinetics.mdaushi.com/)**
+
+*(Note: To view the documentation locally, navigate to the `docs/` directory and run `pnpm install` followed by `pnpm dev`)*
 
 ---
 
