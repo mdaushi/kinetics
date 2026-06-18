@@ -3,7 +3,6 @@ import { TableProps } from "@mdaushi/kinetics-core";
 
 export function useTableProps<TData extends Record<string, unknown>>(
   table: string,
-  url?: string,
 ): TableProps<TData> {
   const props = usePage().props;
   if (!props[table]) {

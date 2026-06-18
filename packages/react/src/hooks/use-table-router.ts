@@ -8,7 +8,7 @@ export function useTableRouter<TData extends Record<string, unknown>>(
   propName: string = "table",
   url?: string,
 ) {
-  const { state: serverState, meta } = useTableProps<TData>(propName, url);
+  const { state: serverState, meta } = useTableProps<TData>(propName);
 
   const ctrl = useMemo(
     () => new TableController(serverState, meta),
@@ -23,6 +23,7 @@ export function useTableRouter<TData extends Record<string, unknown>>(
         preserveState: true,
         preserveScroll: true,
         replace: true,
+        only: [propName],
       });
     },
     [url, meta.default_per_page],

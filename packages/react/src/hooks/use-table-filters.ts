@@ -11,7 +11,7 @@ export function useTableFilters<TData extends Record<string, unknown>>(
     state: serverState,
     meta,
     filters: serverFilters = [],
-  } = useTableProps<TData>(table, url);
+  } = useTableProps<TData>(table);
   const { ctrl, visit } = useTableRouter<TData>(table, url);
 
   const [search, setSearchLocal] = useState(serverState.search ?? "");

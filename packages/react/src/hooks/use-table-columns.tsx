@@ -8,9 +8,8 @@ import { useTableProps } from "./use-table-props";
 
 export function useTableColumns<TData extends Record<string, unknown>>(
   table: string,
-  url?: string,
 ) {
-  const { columns: serverColumns } = useTableProps<TData>(table, url);
+  const { columns: serverColumns } = useTableProps<TData>(table);
 
   const columnDefs = useMemo<ColumnDef<TData>[]>(() => {
     return serverColumns

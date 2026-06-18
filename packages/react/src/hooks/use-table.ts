@@ -35,9 +35,9 @@ export function useTable<TData extends Record<string, unknown>>(
     data,
     meta,
     actions: serverActions = [],
-  } = useTableProps<TData>(propName, url);
+  } = useTableProps<TData>(propName);
 
-  const { columnDefs, serverColumns } = useTableColumns<TData>(propName, url);
+  const { columnDefs, serverColumns } = useTableColumns<TData>(propName);
   const nav = useTableNavigation<TData>(propName, url);
   const filterParams = useTableFilters<TData>(propName, url);
 
