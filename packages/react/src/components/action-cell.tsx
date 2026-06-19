@@ -1,8 +1,11 @@
 import { router } from "@inertiajs/react";
 import type {
+  ActionItem,
   TableAction,
   TableActionGroup,
-  ActionItem,
+  AnyActionItem,
+  AnyAction,
+  AnyActionGroup,
 } from "@mdaushi/kinetics-core";
 import { Button } from "./ui/button";
 import {
@@ -12,33 +15,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { DynamicIcon, IconName } from "lucide-react/dynamic";
 import { useState } from "react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "./ui/alert-dialog";
+import { ConfirmActionDialog } from "./confirm-action-dialog";
+import { DynamicIcon, IconName } from "lucide-react/dynamic";
 
 export type { TableAction, TableActionGroup, ActionItem };
 
 interface ActionCellProps {
-  actions: ActionItem[];
+  actions: AnyActionItem[];
+  payload?: Record<string, any>;
 }
 
-export function ActionCell({ actions }: ActionCellProps) {
-  const [confirmAction, setConfirmAction] = useState<TableAction | null>(null);
+export function ActionCell({ actions, payload }: ActionCellProps) {
+  const [confirmAction, setConfirmAction] = useState<AnyAction | null>(null);
   const [openConfirmAction, setOpenConfirmAction] = useState<boolean>(false);
 
-  function handleActionClick(
-    action: TableAction,
-    e?: React.MouseEvent | Event,
-  ) {
+  function handleActionClick(action: AnyAction, e?: React.MouseEvent | Event) {
     if (e) e.stopPropagation();
     if (action.disabled) return;
 
@@ -46,13 +38,13 @@ export function ActionCell({ actions }: ActionCellProps) {
       setConfirmAction(action);
       setOpenConfirmAction(true);
     } else {
-      execute(action);
+      execute(action, payload);
     }
   }
 
   function handleConfirmExecute() {
     if (confirmAction) {
-      execute(confirmAction);
+      execute(confirmAction, payload);
       setOpenConfirmAction(false);
     }
   }
@@ -77,27 +69,12 @@ export function ActionCell({ actions }: ActionCellProps) {
         )}
       </div>
 
-      <AlertDialog open={openConfirmAction} onOpenChange={setOpenConfirmAction}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {confirmAction?.confirm?.title ?? "Konfirmasi"}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {confirmAction?.confirm?.message}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              variant={confirmAction?.variant}
-              onClick={handleConfirmExecute}
-            >
-              Continue
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmActionDialog
+        action={confirmAction}
+        open={openConfirmAction}
+        onOpenChange={setOpenConfirmAction}
+        onConfirm={handleConfirmExecute}
+      />
     </>
   );
 }
@@ -106,19 +83,30 @@ function ActionButton({
   action,
   onActionClick,
 }: {
-  action: TableAction;
-  onActionClick: (a: TableAction, e: React.MouseEvent) => void;
+  action: AnyAction;
+  onActionClick: (a: AnyAction, e: React.MouseEvent) => void;
 }) {
   return (
     <Button
-      size={"sm"}
+      size={action.icon_only ? "icon" : "sm"}
       onClick={(e) => onActionClick(action, e)}
       disabled={action.disabled}
       title={action.label}
       variant={action.variant}
     >
-      {action.icon && <Icon name={action.icon} />}
-      {action.label}
+      {action.icon && !action.text_only && <Icon name={action.icon} />}
+      {!action.icon_only && (
+        <span
+          className={
+            action.icon_only_on_mobile && action.icon
+              ? "hidden md:inline-block"
+              : ""
+          }
+        >
+          {action.label}
+        </span>
+      )}
+      {action.icon_only && <span className="sr-only">{action.label}</span>}
     </Button>
   );
 }
@@ -127,8 +115,8 @@ function ActionGroupDropdown({
   group,
   onActionClick,
 }: {
-  group: TableActionGroup;
-  onActionClick: (a: TableAction, e: Event) => void;
+  group: AnyActionGroup;
+  onActionClick: (a: AnyAction, e: Event) => void;
 }) {
   const normalActions = group.actions.filter(
     (a) => a.variant !== "destructive",
@@ -142,9 +130,23 @@ function ActionGroupDropdown({
     <DropdownMenu>
       <DropdownMenuTrigger
         render={
-          <Button variant="ghost" size="icon">
-            {group.icon && <Icon name={group.icon} />}
-            <span className="sr-only">Open menu</span>
+          <Button
+            variant={group.variant}
+            size={group.icon_only ? "icon" : "sm"}
+          >
+            {group.icon && !group.text_only && <Icon name={group.icon} />}
+            {!group.icon_only && (
+              <span
+                className={
+                  group.icon_only_on_mobile && group.icon
+                    ? "hidden md:inline-block"
+                    : ""
+                }
+              >
+                {group.label}
+              </span>
+            )}
+            {group.icon_only && <span className="sr-only">{group.label}</span>}
           </Button>
         }
       ></DropdownMenuTrigger>
@@ -179,12 +181,12 @@ function ActionGroupDropdown({
   );
 }
 
-function execute(action: TableAction) {
+function execute(action: AnyAction, payload?: Record<string, any>) {
   if (!action.href) return;
   if (action.method === "get") {
-    router.visit(action.href);
+    router.visit(action.href, { data: payload });
   } else {
-    router.visit(action.href, { method: action.method });
+    router.visit(action.href, { method: action.method, data: payload });
   }
 }
 

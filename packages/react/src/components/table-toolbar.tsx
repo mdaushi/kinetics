@@ -1,5 +1,10 @@
 import * as React from "react";
-import { TableColumn, TableFilter, ActionItem } from "@mdaushi/kinetics-core";
+import {
+  TableColumn,
+  TableFilter,
+  ToolbarActionItem,
+  BulkActionItem,
+} from "@mdaushi/kinetics-core";
 import { X } from "lucide-react";
 
 import { Input } from "./ui/input";
@@ -17,7 +22,10 @@ interface TableToolbarProps {
   setFilter: (key: string, value: unknown) => void;
   reset: () => void;
   debounce?: number;
-  actions?: ActionItem[];
+  actions?: ToolbarActionItem[];
+  bulkActions?: BulkActionItem[];
+  rowSelection?: Record<string, boolean>;
+  selectAllPages?: boolean;
 }
 export function TableToolbar({
   search,
@@ -30,12 +38,15 @@ export function TableToolbar({
   reset,
   debounce,
   actions = [],
+  bulkActions = [],
+  rowSelection = {},
+  selectAllPages = false,
 }: TableToolbarProps) {
   const [draftFilters, setDraftFilters] = React.useState<string[]>([]);
 
   const hasSearch = columns.some((c) => c.searchable);
-
   const hasFilter = search || Object.keys(filters).length > 0;
+  const hasSelection = Object.keys(rowSelection).length > 0 || selectAllPages;
 
   return (
     <div className="flex flex-col gap-3">
@@ -75,9 +86,17 @@ export function TableToolbar({
           </div>
         </div>
 
-        {actions.length > 0 && (
+        {/* Regular actions */}
+        {actions.length > 0 && !hasSelection && (
           <div className="hidden md:flex flex-wrap items-center gap-2 justify-end shrink-0">
             <ActionCell actions={actions} />
+          </div>
+        )}
+
+        {/* Toolbar bulk actions */}
+        {bulkActions.length > 0 && hasSelection && (
+          <div className="hidden md:flex flex-wrap items-center gap-2 justify-end shrink-0">
+            <ActionCell actions={bulkActions} />
           </div>
         )}
       </div>

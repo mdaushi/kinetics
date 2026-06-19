@@ -7,14 +7,33 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
+import { TableSelectionBar } from "./table-selection-bar";
 
 interface RenderTableProps<TData> {
   table: TableInstance<TData>;
+  rowSelection?: Record<string, boolean>;
+  selectAllPages?: boolean;
+  setSelectAllPages?: (val: boolean) => void;
+  totalRecords?: number;
 }
 
-export function RenderTable<TData>({ table }: RenderTableProps<TData>) {
+export function RenderTable<TData>({
+  table,
+  rowSelection = {},
+  selectAllPages = false,
+  setSelectAllPages,
+  totalRecords = 0,
+}: RenderTableProps<TData>) {
   return (
     <div className="overflow-hidden rounded-md border">
+      <TableSelectionBar
+        table={table}
+        rowSelection={rowSelection}
+        selectAllPages={selectAllPages}
+        setSelectAllPages={setSelectAllPages ?? (() => {})}
+        totalRecords={totalRecords}
+      />
+
       <Table>
         <TableHeader className="sticky top-0 z-10 bg-muted">
           {table.getHeaderGroups().map((headerGroup) => (

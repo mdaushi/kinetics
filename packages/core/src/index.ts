@@ -7,8 +7,18 @@ export type {
   TableActionConfirm,
   TableActionGroup,
   ActionItem,
+  ToolbarAction,
+  ToolbarActionGroup,
+  ToolbarActionItem,
+  BulkAction,
+  BulkActionGroup,
+  BulkActionItem,
   TableFilter,
   TableFilterOption,
+  ActionVariant,
+  AnyActionItem,
+  AnyAction,
+  AnyActionGroup,
 } from "./types";
 
 export { TableController } from "./controller";

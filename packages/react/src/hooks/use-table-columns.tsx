@@ -4,15 +4,16 @@ import { ActionItem } from "@mdaushi/kinetics-core";
 import { ActionCell } from "../components/action-cell";
 import { TableColumnHeader } from "../components/table-column-header";
 import { Badge } from "../components/ui/badge";
+import { Checkbox } from "../components/ui/checkbox";
 import { useTableProps } from "./use-table-props";
 
 export function useTableColumns<TData extends Record<string, unknown>>(
   table: string,
 ) {
-  const { columns: serverColumns } = useTableProps<TData>(table);
+  const { columns: serverColumns, bulk_actions } = useTableProps<TData>(table);
 
   const columnDefs = useMemo<ColumnDef<TData>[]>(() => {
-    return serverColumns
+    const defs = serverColumns
       .filter((col) => col.visible)
       .map((col): ColumnDef<TData> => {
         // Action column — auto-inject ActionCell
@@ -66,7 +67,42 @@ export function useTableColumns<TData extends Record<string, unknown>>(
           },
         };
       });
-  }, [serverColumns]);
+
+    if (bulk_actions && bulk_actions.length > 0) {
+      defs.unshift({
+        id: "select",
+        header: ({ table }) => {
+          "use no memo";
+          const isAllSelected = table.getIsAllPageRowsSelected();
+          const isSomeSelected = table.getIsSomePageRowsSelected();
+          return (
+            <Checkbox
+              checked={isAllSelected}
+              indeterminate={!isAllSelected && isSomeSelected}
+              onCheckedChange={(value) =>
+                table.toggleAllPageRowsSelected(!!value)
+              }
+              aria-label="Select all"
+            />
+          );
+        },
+        cell: ({ row }) => {
+          "use no memo";
+          return (
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              aria-label="Select row"
+            />
+          );
+        },
+        enableSorting: false,
+        enableHiding: false,
+      });
+    }
+
+    return defs;
+  }, [serverColumns, bulk_actions]);
 
   return { columnDefs, serverColumns };
 }
