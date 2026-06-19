@@ -30,6 +30,7 @@ class TableContext
         array $columns,
         array $filters = [],
         public readonly array $actions = [],
+        public readonly array $bulkActions = [],
     ) {
         $this->columns = $columns;
         $this->filters = $filters;

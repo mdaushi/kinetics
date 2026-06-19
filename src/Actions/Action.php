@@ -2,57 +2,28 @@
 
 namespace Kinetics\Actions;
 
+use Kinetics\Actions\Enums\ActionVariant;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
- * Represents a single action (button/link) in the action column.
+ * Represents a single action (button/link) in the action column (per row).
  *
  * Each Action has:
  * - a label and icon for UI
  * - an href or handler for navigation/modal
  * - visibility and disabled conditions (closures evaluated per row)
  * - variants for styling
+ *
+ * For toolbar-level actions, use ToolbarAction.
+ * For bulk/selection actions, use BulkAction.
  */
-class Action
+class Action extends BaseAction
 {
-    private string $key;
-
-    private string $label;
-
-    private ?string $icon = null;
-
-    private string $variant = 'outline';
-
-    /** @var string|\Closure|null */
-    private mixed $href = null;
-
-    private string $method = 'get';
+    protected ActionVariant $variant = ActionVariant::OUTLINE;
 
     private bool $asModal = false;
 
-    private ?\Closure $visibleWhen = null;
-
-    private ?\Closure $disabledWhen = null;
-
-    private bool $requiresConfirmation = false;
-
-    private ?string $confirmationMessage = null;
-
-    private ?string $confirmationTitle = null;
-
-    private array $meta = [];
-
-    private function __construct(string $key)
-    {
-        $this->key = $key;
-    }
-
     // Static constructor
-
-    public static function make(string $key): static
-    {
-        return new static($key);
-    }
 
     // Preset constructors for common actions
 
@@ -60,8 +31,7 @@ class Action
     {
         $action = static::make('edit')
             ->label('Edit')
-            ->icon('pencil')
-            ->variant('outline');
+            ->icon('pencil');
 
         if ($routeName) {
             $action->href($routeName);
@@ -74,8 +44,7 @@ class Action
     {
         $action = static::make('view')
             ->label('View')
-            ->icon('eye')
-            ->variant('outline');
+            ->icon('eye');
 
         if ($routeName) {
             $action->href($routeName);
@@ -89,7 +58,7 @@ class Action
         $action = static::make('delete')
             ->label('Delete')
             ->icon('trash')
-            ->variant('destructive')
+            ->variant(ActionVariant::DESTRUCTIVE)
             ->method('delete')
             ->confirm(message: 'Are you sure you want to delete this record?');
 
@@ -98,67 +67,6 @@ class Action
         }
 
         return $action;
-    }
-
-    // Fluent API
-
-    public function label(string $label): static
-    {
-        $this->label = $label;
-
-        return $this;
-    }
-
-    public function icon(string $icon): static
-    {
-        $this->icon = $icon;
-
-        return $this;
-    }
-
-    /**
-     * Set the styling variant.
-     *
-     * @param  'default'|'destructive'|'ghost'|'outline'  $variant
-     */
-    public function variant(string $variant): static
-    {
-        $allowedVariants = ['default', 'destructive', 'ghost', 'outline'];
-
-        if (! in_array($variant, $allowedVariants, true)) {
-            throw new \InvalidArgumentException(
-                sprintf('Invalid variant "%s". Allowed variants are: %s', $variant, implode(', ', $allowedVariants))
-            );
-        }
-        $this->variant = $variant;
-
-        return $this;
-    }
-
-    /**
-     * Route name for the action, or a closure.
-     *
-     * Example:
-     * ->href('users.edit')
-     * ->href(fn($row) => route('users.edit', $row['id']))
-     */
-    public function href(string|\Closure $href): static
-    {
-        $this->href = $href;
-
-        return $this;
-    }
-
-    /**
-     * Set method.
-     *
-     * @param  'get'|'post'|'put'|'patch'|'delete'  $method
-     */
-    public function method(string $method): static
-    {
-        $this->method = strtoupper($method);
-
-        return $this;
     }
 
     /**
@@ -171,55 +79,7 @@ class Action
         return $this;
     }
 
-    /**
-     * Per-row visibility conditions.
-     *
-     * Example:
-     * ->visibleWhen(fn($row) => $row->status === 'draft')
-     */
-    public function visibleWhen(\Closure $condition): static
-    {
-        $this->visibleWhen = $condition;
-
-        return $this;
-    }
-
-    /**
-     * Per-row disabled condition.
-     *
-     * Example:
-     * ->disabledWhen(fn($row) => ! auth()->user()->can('edit', $row))
-     */
-    public function disabledWhen(\Closure $condition): static
-    {
-        $this->disabledWhen = $condition;
-
-        return $this;
-    }
-
-    /**
-     * Display a confirmation dialog before the action is executed.
-     */
-    public function confirm(string $title = 'Are you sure?', string $message = ''): static
-    {
-        $this->requiresConfirmation = true;
-        $this->confirmationMessage = $message;
-        $this->confirmationTitle = $title;
-
-        return $this;
-    }
-
-    /**
-     * Arbitrary metadata sent to FE.
-     */
-    public function meta(array $meta): static
-    {
-        $this->meta = $meta;
-
-        return $this;
-    }
-
-    // Resolve per-row
+    // Internals
 
     /**
      * Resolve action for one row — evaluate all closures.
@@ -228,28 +88,15 @@ class Action
     {
         $rowArr = $this->normalizeRow($row);
 
-        $isVisible = $this->visibleWhen ? ($this->visibleWhen)($row) : true;
-        $isDisabled = $this->disabledWhen ? ($this->disabledWhen)($row) : false;
-
-        if (! $isVisible) {
+        if (! $this->isVisible($row)) {
             return [];
         }
 
-        return [
-            'key' => $this->key,
-            'label' => $this->label,
-            'icon' => $this->icon,
-            'variant' => $this->variant,
+        return array_merge($this->resolveBaseAttributes(), [
             'href' => $this->resolveHref($rowArr),
-            'method' => $this->method,
             'modal' => $this->asModal,
-            'disabled' => $isDisabled,
-            'confirm' => $this->requiresConfirmation ? [
-                'message' => $this->confirmationMessage,
-                'title' => $this->confirmationTitle,
-            ] : null,
-            'meta' => $this->meta,
-        ];
+            'disabled' => $this->isDisabled($row),
+        ]);
     }
 
     // Internals

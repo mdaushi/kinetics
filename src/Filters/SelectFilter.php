@@ -19,7 +19,7 @@ class SelectFilter extends Filter
     public function options(array $options): static
     {
         // If the array is already in the final format [['value' => x, 'label' => y]]
-        if (!empty($options) && array_is_list($options) && is_array($options[0]) && array_key_exists('value', $options[0]) && array_key_exists('label', $options[0])) {
+        if (! empty($options) && array_is_list($options) && is_array($options[0]) && array_key_exists('value', $options[0]) && array_key_exists('label', $options[0])) {
             return $this->meta('options', $options);
         }
 

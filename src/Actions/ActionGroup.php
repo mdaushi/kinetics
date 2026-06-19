@@ -2,6 +2,8 @@
 
 namespace Kinetics\Actions;
 
+use Kinetics\Actions\Enums\ActionVariant;
+
 /**
  * Groups multiple actions into a dropdown menu.
  * Useful when a row has multiple actions to avoid cluttering a column.
@@ -14,39 +16,14 @@ namespace Kinetics\Actions;
  *           Action::make('archive')->label('Archive'),
  *       ])
  */
-class ActionGroup
+class ActionGroup extends BaseActionGroup
 {
-    private string $label = 'Actions';
-
-    private ?string $icon = 'ellipsis-vertical';
-
     /** @var Action[] */
-    private array $actions = [];
+    protected array $actions = [];
 
-    private function __construct(string $label)
-    {
-        $this->label = $label;
-    }
+    protected bool $iconOnly = true;
 
-    public static function make(string $label = 'Actions'): static
-    {
-        return new static($label);
-    }
-
-    public function icon(string $icon): static
-    {
-        $this->icon = $icon;
-
-        return $this;
-    }
-
-    /** @param Action[] $actions */
-    public function actions(array $actions): static
-    {
-        $this->actions = $actions;
-
-        return $this;
-    }
+    protected ActionVariant $variant = ActionVariant::GHOST;
 
     /**
      * Resolve group for one row — invisible filter action.
@@ -59,11 +36,8 @@ class ActionGroup
             ->values()
             ->toArray();
 
-        return [
-            'type' => 'group',
-            'label' => $this->label,
-            'icon' => $this->icon,
+        return array_merge($this->resolveBaseAttributes(), [
             'actions' => $resolved,
-        ];
+        ]);
     }
 }

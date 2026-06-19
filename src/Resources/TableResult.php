@@ -36,6 +36,7 @@ class TableResult implements \JsonSerializable
             'columns' => $this->getColumns(),
             'filters' => $this->context->getFiltersArray(),
             'actions' => $this->getActions(),
+            'bulk_actions' => $this->getBulkActions(),
             'meta' => $this->getMeta(),
             'state' => $this->getState(),
         ];
@@ -80,13 +81,28 @@ class TableResult implements \JsonSerializable
     {
         return collect($this->context->actions)
             ->map(function ($action) {
-                $resolved = $action->resolve(null);
+                $resolved = $action->resolve();
                 if (empty($resolved) || (isset($resolved['actions']) && empty($resolved['actions']))) {
                     return null;
                 }
 
-                if ($action instanceof Action) {
-                    return array_merge(['type' => 'action'], $resolved);
+                return $resolved;
+            })
+            ->filter()
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Bulk actions resolved for the frontend.
+     */
+    public function getBulkActions(): array
+    {
+        return collect($this->context->bulkActions)
+            ->map(function ($action) {
+                $resolved = $action->resolve();
+                if (empty($resolved) || (isset($resolved['actions']) && empty($resolved['actions']))) {
+                    return null;
                 }
 
                 return $resolved;

@@ -33,6 +33,8 @@ class Table
 
     private array $actions = [];
 
+    private array $bulkActions = [];
+
     /** @var class-string<PipeInterface>[]|PipeInterface[] */
     private array $extraPipes = [];
 
@@ -97,6 +99,16 @@ class Table
     public function actions(array $actions): static
     {
         $this->actions = $actions;
+
+        return $this;
+    }
+
+    /**
+     * Define global bulk actions (active when rows are selected).
+     */
+    public function bulkActions(array $actions): static
+    {
+        $this->bulkActions = $actions;
 
         return $this;
     }
@@ -287,6 +299,7 @@ class Table
             columns: $this->columns,
             filters: $this->filters,
             actions: $this->actions,
+            bulkActions: $this->bulkActions,
         );
 
         $context->setMeta('debounce', $this->debounce);
