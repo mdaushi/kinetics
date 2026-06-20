@@ -1,45 +1,58 @@
 ---
-title: Actions Overview
-description: Pengenalan komponen Action dan Global Actions di Kinetics.
+title: Table Actions Overview
+description: Pengenalan aksi pada tingkat tabel (Toolbar dan Bulk actions) di Kinetics.
 ---
 
-Aksi (*Actions*) adalah tombol interaktif yang memungkinkan pengguna melakukan operasi, seperti pindah ke halaman pembuatan data, mengedit baris, atau menghapus data. Di Kinetics, aksi sepenuhnya didefinisikan dan dikendalikan dari server (Laravel).
+Sementara aksi tingkat baris (seperti Edit atau Hapus untuk sebuah data spesifik) ditangani secara individual di dalam `ActionColumn`, Kinetics juga menyediakan **aksi tingkat tabel** (table-level actions) yang sangat kuat. Ini adalah aksi-aksi yang berlaku untuk keseluruhan tabel secara kolektif, atau untuk beberapa baris yang dipilih sekaligus.
 
-Komponen inti yang mengendalikan semua ini adalah class `Action`.
+Pada bagian ini, kita akan membahas dua jenis aksi tingkat tabel yang disediakan oleh Kinetics:
 
-## Di mana meletakkan Actions?
+## 1. Toolbar Actions
 
-Ada dua penempatan berbeda untuk Aksi di tabel Kinetics:
+Tombol global yang berlaku untuk seluruh halaman atau kumpulan data, seperti "Buat Baru" atau "Impor CSV". Aksi ini tidak bergantung pada seleksi baris dan dirender secara konstan di bagian atas tabel di dalam **Toolbar**.
 
-### 1. Global Actions (Aksi Jenderal/Umum)
-*Global actions* adalah tombol yang berlaku untuk keseluruhan tabel, bukan untuk baris spesifik. Ini biasanya digunakan untuk tombol "Create New", "Export", dll, dan di-render di bagian atas tabel di dalam **Toolbar**.
-
-Anda mendaftarkan *global actions* dengan memanggil metode `actions()` langsung pada instance `Table`.
+Anda mendaftarkan *toolbar actions* dengan memanggil metode `actions()` langsung pada *instance* `Table` Anda.
 
 ```php
 use Kinetics\Table;
-use Kinetics\Actions\Action;
+use Kinetics\Actions\ToolbarAction;
 
 $table = Table::model(User::class)
-    ->actions([
-        // Ini adalah Global Action
-        Action::make('create')
-            ->label('Tambah User')
+    ->bulkActions([
+        ToolbarAction::make('create')
+            ->label('Buat User')
             ->href(route('users.create'))
     ])
     ->columns([
-        // ... definisi kolom
+        // ...
     ])
     ->make();
 ```
 
-### 2. Row Actions (Action Column)
-*Row actions* adalah tombol yang berlaku untuk *record* (baris) spesifik, seperti "Edit" atau "Hapus". Untuk menambahkan aksi ini, Anda harus meletakkan komponen `Action` di dalam sebuah `ActionColumn`.
+Untuk mempelajari lebih lanjut tentang konfigurasi dan jalan pintas (*presets*), baca dokumentasi [Toolbar Actions](/id/actions/toolbar).
 
-*(Untuk mempelajari cara mengatur wadah bagi aksi baris ini, silakan baca dokumentasi [Action Column](/id/columns/action)).*
+## 2. Bulk Actions
 
-## Mengonfigurasi Actions
+Operasi massal yang berlaku untuk beberapa baris yang dipilih sekaligus, seperti "Hapus yang Dipilih" atau "Ekspor yang Dipilih". Aksi ini otomatis muncul di dalam bilah melayang (*floating bar*) atau di dalam *toolbar* setiap kali pengguna mencentang kotak pilihan (*checkbox*) di tabel.
 
-Baik Anda meletakkan Action secara global di *toolbar*, maupun spesifik pada baris di dalam `ActionColumn`, cara Anda mengonfigurasi komponen `Action` tetap sama persis!
+*Bulk actions* juga didaftarkan di dalam metode `actions()` yang sama pada *instance* `Table`.
 
-Pada halaman-halaman berikutnya, kita akan membahas semua fitur luar biasa dari class `Action`, seperti *shortcut* bawaan, visibilitas dinamis, dan grup *dropdown*.
+```php
+use Kinetics\Table;
+use Kinetics\Actions\BulkAction;
+
+$table = Table::model(User::class)
+    ->bulkActions([
+        BulkAction::delete('users.bulk-delete')
+    ])
+    ->columns([
+        // ...
+    ])
+    ->make();
+```
+
+Untuk mempelajari lebih lanjut tentang pemrosesan *payload* dan status seleksi, baca dokumentasi [Bulk Actions](/id/actions/bulk).
+
+---
+> [!NOTE]
+> Mencari aksi yang spesifik untuk baris (seperti tombol "Edit" individual di sebelah suatu rekaman data)? Silakan merujuk ke dokumentasi [Action Column](/id/columns/action).

@@ -39,3 +39,13 @@ When `range()` is enabled:
 1. The frontend UI transforms to accept two numeric inputs (Minimum and Maximum).
 2. The operator is forcefully set to `between`.
 3. The SQL query generated will use the `WHERE ... BETWEEN` logic.
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `make(string $key)` | Creates a new filter instance. |
+| `label(string $label)` | Sets the filter label. |
+| `column(string $column)`| Specifies the database column name if different from the key. |
+| `relation(string $relation, string $relationKey)`| Explicitly sets the relationship to query. |
+| `operators(array $operators)`| Overrides the allowed operators for this filter. |

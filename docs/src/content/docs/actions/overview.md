@@ -1,45 +1,58 @@
 ---
-title: Actions Overview
-description: Introduction to the Action component and Global Actions in Kinetics.
+title: Table Actions Overview
+description: Introduction to table-level actions (Toolbar and Bulk actions) in Kinetics.
 ---
 
-Actions are interactive buttons that allow users to perform operations, such as navigating to a creation page, editing a row, or deleting data. In Kinetics, actions are fully defined and controlled from the server (Laravel).
+While row-level actions (like Edit or Delete for a specific record) are handled individually inside an `ActionColumn`, Kinetics also provides powerful **table-level actions**. These are actions that apply to the entire table collectively, or to multiple selected rows at once.
 
-The core component that drives all of this is the `Action` class.
+In this section, we will discuss the two types of table-level actions provided by Kinetics:
 
-## Where to place Actions?
+## 1. Toolbar Actions
 
-There are two distinct placements for Actions in a Kinetics table:
+Global buttons that apply to the entire page or dataset, such as "Create New" or "Import CSV". They do not rely on row selection and are rendered constantly at the top of the table in the **Toolbar**.
 
-### 1. Global Actions (General Actions)
-Global actions are buttons that apply to the entire table, not to a specific row. They are typically used for "Create New" buttons, "Export" buttons, etc., and are rendered at the top of the table in the **Toolbar**.
-
-You register global actions by calling the `actions()` method directly on the `Table` instance.
+You register toolbar actions by calling the `actions()` method directly on your `Table` instance.
 
 ```php
 use Kinetics\Table;
-use Kinetics\Actions\Action;
+use Kinetics\Actions\ToolbarAction;
 
 $table = Table::model(User::class)
-    ->actions([
-        // This is a Global Action
-        Action::make('create')
+    ->bulkActions([
+        ToolbarAction::make('create')
             ->label('Create User')
             ->href(route('users.create'))
     ])
     ->columns([
-        // ... column definitions
+        // ...
     ])
     ->make();
 ```
 
-### 2. Row Actions (Action Column)
-Row actions are buttons that apply to a specific record (row), such as "Edit" or "Delete". To add these, you must place your `Action` components inside an `ActionColumn`.
+To learn more about configuration and presets, read the [Toolbar Actions](/actions/toolbar) documentation.
 
-*(To learn how to set up the container for row actions, please read the [Action Column](/columns/action) documentation).*
+## 2. Bulk Actions
 
-## Configuring Actions
+Batch operations that apply to multiple selected rows at once, such as "Delete Selected" or "Export Selected". They automatically appear in a floating bar (or within the toolbar) whenever the user selects checkboxes in the table.
 
-Whether you are placing an Action globally in the toolbar, or specifically in a row inside an `ActionColumn`, the way you configure the `Action` component remains exactly the same!
+Bulk actions are also registered in the same `actions()` method on the `Table` instance.
 
-On the next pages, we will discuss all the powerful features of the `Action` class, such as preset shortcuts, dynamic visibility, and dropdown groups.
+```php
+use Kinetics\Table;
+use Kinetics\Actions\BulkAction;
+
+$table = Table::model(User::class)
+    ->bulkActions([
+        BulkAction::delete('users.bulk-delete')
+    ])
+    ->columns([
+        // ...
+    ])
+    ->make();
+```
+
+To learn more about processing payloads and selection states, read the [Bulk Actions](/actions/bulk) documentation.
+
+---
+> [!NOTE]
+> Looking for row-specific actions (like an individual "Edit" button next to a record)? Please refer to the [Action Column](/columns/action) documentation.

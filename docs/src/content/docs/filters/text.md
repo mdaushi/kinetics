@@ -26,3 +26,13 @@ By default, the `TextFilter` supports a wide array of string and numeric operato
 - `<`, `<=`, `>`, `>=` (Useful if the text field contains numbers or for alphabetical sorting logic)
 
 The frontend UI will present these options in a dropdown next to the text input so the user can easily switch operators.
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `make(string $key)` | Creates a new filter instance. |
+| `label(string $label)` | Sets the filter label. |
+| `column(string $column)`| Specifies the database column name if different from the key. |
+| `relation(string $relation, string $relationKey)`| Explicitly sets the relationship to query. |
+| `operators(array $operators)`| Overrides the allowed operators for this filter. |

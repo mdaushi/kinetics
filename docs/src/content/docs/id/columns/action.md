@@ -44,4 +44,12 @@ $table = Table::model(User::class)
 ## Menambahkan Aksi
 
 Metode `->actions([...])` pada `ActionColumn` menerima sebuah *array* berisi objek-objek Action. 
-Untuk mempelajari cara membuat dan mengonfigurasi objek-objek Action ini (termasuk tombol, warna, ikon, dan grup), silakan baca panduan lengkapnya di bagian [Actions Overview](/id/actions/overview).
+Untuk mempelajari cara membuat dan mengonfigurasi objek-objek Action ini (termasuk tombol, warna, ikon, dan grup), silakan baca panduan lengkapnya di bagian [Action Buttons](/id/columns/action-buttons).
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key = '__actions')` | Creates a new action column instance. |
+| `actions(array $actions)` | Registers the action objects for this column. |
+| `hidden(bool $value = true)` | Hides the column from the table. |

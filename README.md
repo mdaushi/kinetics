@@ -145,7 +145,7 @@ Kinetics features a comprehensive documentation site. It covers everything from 
 ## Roadmap
 
 - [ ] Export (CSV / XLSX) — respects active filters, skips pagination
-- [ ] Bulk actions — checkbox selection + batch operations
+- [x] Bulk actions — checkbox selection + batch operations
 - [ ] Column visibility toggle — persist per-user
 - [ ] Saved filter presets
 - [ ] Vue adapter (`@kinetics/vue`)

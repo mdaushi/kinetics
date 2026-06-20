@@ -82,6 +82,32 @@ Action::make('edit')
     ->icon('pencil') // Instructs the frontend to render a pencil icon
 ```
 
+### Display Modes
+
+Sometimes you want an action to only display its icon (hiding the text) to save space, or conversely, only display text. Kinetics provides responsive display modes out of the box via the `HasDisplayMode` trait.
+
+```php
+Action::make('view')
+    ->label('View Details')
+    ->icon('eye')
+    ->iconOnly() // The button will only show the eye icon
+    
+Action::make('delete')
+    ->label('Delete')
+    ->icon('trash')
+    ->textOnly() // The button will only show the text 'Delete', hiding the trash icon
+```
+
+**Responsive Display:**
+If you want the button to show both icon and text on desktop, but collapse to an icon-only button on mobile screens, use `iconOnlyOnMobile()`:
+
+```php
+Action::make('edit')
+    ->label('Edit')
+    ->icon('pencil')
+    ->iconOnlyOnMobile() // Text visible on md+ screens, icon only on sm screens
+```
+
 ## Advanced Interactivity
 
 ### Confirmation Dialogs (`confirm`)
@@ -114,3 +140,21 @@ Action::make('quick_edit')
     ->href(fn($row) => route('users.edit', $row['id']))
     ->modal()
 ```
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `make(string $key)` | Creates a new action instance. |
+| `label(string $label)` | Sets the button label. |
+| `icon(string $icon)` | Sets the button icon. |
+| `variant(ActionVariant\|string $variant)` | Sets the button variant (e.g., default, outline, destructive). |
+| `href(string\|\Closure $href)` | Sets the target URL or route name. |
+| `method(string $method)`| Sets the HTTP method (get, post, put, delete, etc.). |
+| `confirm(...)` | Attaches a confirmation dialog to the action. |
+| `visibleWhen(bool\|\Closure $condition)`| Dynamically shows or hides the action per row. |
+| `disabledWhen(bool\|\Closure $condition)`| Dynamically enables or disables the action per row. |
+| `modal(bool $value = true)` | Opens the target link inside a modal. |
+| `iconOnly(bool $value = true)` | Hides the text and only shows the icon. |
+| `textOnly(bool $value = true)` | Hides the icon and only shows the text. |
+| `iconOnlyOnMobile(bool $value = true)` | Collapses text on mobile screens. |

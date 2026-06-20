@@ -34,3 +34,14 @@ When `range()` is enabled:
 1. The frontend UI transforms into a dual date-picker (start and end).
 2. The available operator is forcefully set to `between`.
 3. The SQL query generated will use the `WHERE ... BETWEEN` logic.
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `make(string $key)` | Creates a new filter instance. |
+| `label(string $label)` | Sets the filter label. |
+| `column(string $column)`| Specifies the database column name if different from the key. |
+| `relation(string $relation, string $relationKey)`| Explicitly sets the relationship to query. |
+| `operators(array $operators)`| Overrides the allowed operators for this filter. |
+| `range(bool $condition = true)`| Sets this filter to act purely as a date range filter (from-to). |

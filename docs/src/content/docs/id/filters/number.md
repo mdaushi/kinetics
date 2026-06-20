@@ -39,3 +39,13 @@ Ketika `range()` diaktifkan:
 1. Antarmuka *frontend* akan berubah menjadi dua input angka sekaligus (Minimum dan Maksimum).
 2. Operatornya akan dikunci secara paksa menjadi `between` (di antara).
 3. *Query* SQL yang dihasilkan akan menggunakan logika `WHERE ... BETWEEN`.
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key)` | Creates a new filter instance. |
+| `label(string $label)` | Sets the filter label. |
+| `column(string $column)`| Specifies the database column name if different from the key. |
+| `relation(string $relation, string $relationKey)`| Explicitly sets the relationship to query. |
+| `operators(array $operators)`| Overrides the allowed operators for this filter. |

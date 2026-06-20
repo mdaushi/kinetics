@@ -102,3 +102,20 @@ TextColumn::make('status')
         'deleted'   => 'destructive',
     ])
 ```
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key)` | Creates a new column instance. |
+| `label(string $label)` | Sets the column header label. |
+| `as(string $outputKey)` | Sets an alias for the output key. |
+| `sortable(bool $value = true)` | Enables sorting for this column. |
+| `searchable(bool $value = true)` | Enables searching for this column. |
+| `hidden(bool $value = true)` | Hides the column from the table. |
+| `formatUsing(\Closure $cb)`| Customizes the output formatting via closure. |
+| `badge(bool $condition = true)`| Renders the column data as a badge. |
+| `color(string\|array $color)`| Sets the badge color. |
+| `date(string $format)` | Formats the data as a date. |
+| `time(string $format)` | Formats the data as time. |
+| `dateTime(string $format)` | Formats the data as datetime. |

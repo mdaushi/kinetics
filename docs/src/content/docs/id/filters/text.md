@@ -26,3 +26,13 @@ Secara bawaan, `TextFilter` mendukung banyak sekali operator *string* dan numeri
 - `<`, `<=`, `>`, `>=` (Berguna jika *field* teks tersebut mengandung angka atau untuk logika alfabet)
 
 Antarmuka *frontend* akan menyajikan opsi-opsi ini dalam sebuah *dropdown* di sebelah *input* teks, sehingga pengguna bisa mengganti operator pencariannya dengan mudah.
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key)` | Creates a new filter instance. |
+| `label(string $label)` | Sets the filter label. |
+| `column(string $column)`| Specifies the database column name if different from the key. |
+| `relation(string $relation, string $relationKey)`| Explicitly sets the relationship to query. |
+| `operators(array $operators)`| Overrides the allowed operators for this filter. |

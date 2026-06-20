@@ -32,7 +32,7 @@ $table = Table::query($query)->make();
 
 ## Registering Components
 
-The `Table` class is where you register the three core visual components of your datatable: Columns, Filters, and Actions.
+The `Table` class is where you register the visual components of your datatable: Columns, Filters, and Actions.
 
 ```php
 $table = Table::model(User::class)
@@ -43,7 +43,10 @@ $table = Table::model(User::class)
         // Define your TextFilter, SelectFilter, etc.
     ])
     ->actions([
-        // Define global table Actions (e.g., Export)
+        // Define ToolbarAction instances
+    ])
+    ->bulkActions([
+        // Define BulkAction instances (active when rows are selected)
     ])
     ->make();
 ```
@@ -62,6 +65,14 @@ Table::model(User::class)
         $query->where('tenant_id', auth()->user()->tenant_id);
     })
     ->make();
+```
+
+### Overriding the Request (`withRequest`)
+
+By default, the Table uses the global HTTP request. If you are testing or need to inject a mock request, use `withRequest()`.
+
+```php
+Table::model(User::class)->withRequest($customRequest)->make();
 ```
 
 ### Pagination Settings (`perPage`)
@@ -95,21 +106,29 @@ Table::model(Log::class)
     ->make();
 ```
 
-### Disabling Default Pipes (`withoutPipes`)
+### Customizing Pipelines (`pipes` and `withoutPipes`)
 
-If you want to completely disable built-in features (for instance, you handle sorting manually), you can remove default pipes.
+Kinetics runs your query through a series of "pipes" (Search, Filter, Sort, Paginate). You can inject your own custom pipes, or disable the default ones.
 
 ```php
 use Kinetics\Pipes\SortPipe;
+use App\Pipes\MyCustomExportPipe;
 
 Table::model(User::class)
-    ->withoutPipes([SortPipe::class])
+    ->withoutPipes([SortPipe::class]) // Disable built-in sorting
+    ->pipes([MyCustomExportPipe::class]) // Inject a custom pipe before pagination
     ->make();
 ```
 
-## Output Formatting (`get` vs `make`)
+## Output Formatting (`make` vs `get` vs `paginate`)
 
 Throughout the documentation, we use `->make()` which immediately processes the pipeline and returns a pure Array. This is perfect for Inertia.js.
+
+```php
+return Inertia::render('Users/Index', [
+    'table' => Table::model(User::class)->make()
+]);
+```
 
 However, if you are building an API or writing Unit Tests, you might want to inspect the generated result. Use the `get()` method to retrieve a `TableResult` object.
 
@@ -124,3 +143,32 @@ $paginator = $result->getPaginator(); // Raw Laravel LengthAwarePaginator
 // You can still return it as JSON natively!
 return response()->json($result);
 ```
+
+If you only want the raw Laravel Paginator and want to bypass Kinetics' formatting entirely, use `paginate()`:
+
+```php
+$paginator = Table::model(User::class)->paginate();
+```
+
+---
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `model(string $modelClass)` | **[Static]** Initializes the table from an Eloquent Model class. |
+| `query(Builder $query)` | **[Static]** Initializes the table from an existing Query Builder instance. |
+| `columns(array $columns)` | Registers the column definitions. |
+| `filters(array $filters)` | Registers the filter definitions. |
+| `actions(array $actions)` | Registers global toolbar actions. |
+| `bulkActions(array $actions)` | Registers bulk actions (active when rows are selected). |
+| `perPage(int $default, int $max)`| Sets the default and maximum allowed items per page. |
+| `debounce(int $ms)` | Sets the frontend debounce delay for search/filter inputs. |
+| `defaultSort(string $col, string $dir)`| Sets the default sorting column and direction. |
+| `pipes(array $pipes)` | Injects custom pipes into the query processing pipeline. |
+| `withoutPipes(array $pipes)` | Removes default pipes (e.g. to disable default sorting). |
+| `tap(\Closure $callback)` | Applies additional constraints to the base query. |
+| `withRequest(Request $request)`| Overrides the HTTP request object used by the table. |
+| `make()` | Executes the pipeline and returns a formatted Array (ideal for Inertia). |
+| `get()` | Executes the pipeline and returns a `TableResult` object. |
+| `paginate()` | Executes the pipeline and returns the raw `LengthAwarePaginator`. |

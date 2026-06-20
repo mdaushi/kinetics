@@ -42,6 +42,8 @@ export default defineConfig({
             { label: "Overview", slug: "columns/overview" },
             { label: "Text Column", slug: "columns/text" },
             { label: "Action Column", slug: "columns/action" },
+            { label: "Action Buttons", slug: "columns/action-buttons" },
+            { label: "Action Groups", slug: "columns/action-groups" },
           ],
         },
         {
@@ -59,8 +61,10 @@ export default defineConfig({
           label: "Actions",
           items: [
             { label: "Overview", slug: "actions/overview" },
-            { label: "Buttons", slug: "actions/buttons" },
-            { label: "Groups", slug: "actions/groups" },
+            { label: "Toolbar Actions", slug: "actions/toolbar" },
+            { label: "Toolbar Action Groups", slug: "actions/toolbar-groups" },
+            { label: "Bulk Actions", slug: "actions/bulk" },
+            { label: "Bulk Action Groups", slug: "actions/bulk-groups" },
           ],
         },
         {

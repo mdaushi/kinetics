@@ -51,3 +51,14 @@ Anda juga bisa melempar *array* asosiatif yang memuat parameter baku `value` dan
 ## Operator
 
 Secara logis, `SelectFilter` akan otomatis membatasi operator pencariannya hanya pada perintah `is` (harus sama persis) dan `is_not` (kecualikan nilai ini).
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key)` | Creates a new filter instance. |
+| `label(string $label)` | Sets the filter label. |
+| `column(string $column)`| Specifies the database column name if different from the key. |
+| `relation(string $relation, string $relationKey)`| Explicitly sets the relationship to query. |
+| `operators(array $operators)`| Overrides the allowed operators for this filter. |
+| `options(array $options)`| Sets the options for the select dropdown (key-value pairs or array of arrays). |

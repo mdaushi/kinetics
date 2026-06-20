@@ -17,16 +17,30 @@ ActionGroup::make('Opsi Lainnya')
     ->actions([
         Action::make('view')
             ->label('Lihat')
+            ->variant('default')
             ->href(fn ($record) => route('users.show', $record)),
             
         Action::make('edit')
             ->label('Edit')
+            ->variant('default')
             ->href(fn ($record) => route('users.edit', $record)),
             
-        Action::make('delete')
-            ->label('Hapus')
+        Action::delete()
+            ->label('Hapus') // Menimpa label default
             ->href(fn ($record) => route('users.destroy', $record))
     ])
+```
+
+## Varian yang Diizinkan (Allowed Variants)
+
+Secara bawaan (*default*), sebuah `Action` yang dibuat menggunakan `Action::make()` akan memiliki varian `outline`. Namun, `ActionGroup` me-render anak-anaknya di dalam menu dropdown. Karena batasan antarmuka (*UI constraints*) ini, **sebuah `ActionGroup` secara ketat mengharuskan setiap `Action` di dalamnya untuk memiliki varian `default` atau `destructive`**. Varian selain itu akan memicu *error* berupa `InvalidArgumentException`.
+
+Jika Anda menggunakan *preset action* seperti `Action::delete()`, variannya sudah otomatis diatur menjadi `destructive`. Tetapi jika Anda menggunakan `Action::make()`, selalu ingat untuk secara eksplisit mengatur variannya:
+
+```php
+Action::make('duplicate')
+    ->label('Duplikat')
+    ->variant('default') // Wajib di dalam ActionGroup
 ```
 
 ## Hasil di Frontend
@@ -43,10 +57,23 @@ Jika pengguna tidak memiliki akses untuk "Menghapus" sebuah baris (karena evalua
 ActionGroup::make('Lainnya')
     ->actions([
         // ...
-        Action::make('delete')
+        Action::delete()
             ->label('Hapus')
             ->href(fn ($record) => route('users.destroy', $record))
             // Opsi hapus akan hilang dari dropdown jika baris data ini terkunci
             ->visibleWhen(fn ($record) => !$record->is_locked) 
     ])
 ```
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key)` | Creates a new action group instance. |
+| `label(string $label)` | Sets the dropdown trigger label. |
+| `icon(string $icon)` | Sets the dropdown trigger icon. |
+| `actions(array $actions)` | Registers the child Action objects inside the dropdown. |
+| `variant(ActionVariant\|string $variant)`| Sets the trigger button variant. |
+| `iconOnly(bool $value = true)` | Shows only the icon for the trigger button. |
+| `textOnly(bool $value = true)` | Shows only the text for the trigger button. |
+| `iconOnlyOnMobile(bool $value = true)` | Collapses text on mobile screens. |

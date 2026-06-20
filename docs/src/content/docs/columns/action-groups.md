@@ -17,16 +17,29 @@ ActionGroup::make('More Options')
     ->actions([
         Action::make('view')
             ->label('View')
+            ->variant('default')
             ->href(fn ($record) => route('users.show', $record)),
             
         Action::make('edit')
             ->label('Edit')
+            ->variant('default')
             ->href(fn ($record) => route('users.edit', $record)),
             
-        Action::make('delete')
-            ->label('Delete')
+        Action::delete()
             ->href(fn ($record) => route('users.destroy', $record))
     ])
+```
+
+## Allowed Variants
+
+By default, an `Action` created via `Action::make()` uses the `outline` variant. However, `ActionGroup` renders its children inside a dropdown menu. Because of this UI constraint, **an `ActionGroup` strictly requires its child `Action`s to have a variant of either `default` or `destructive`**. Any other variant will throw an `InvalidArgumentException`.
+
+If you are using preset actions like `Action::delete()`, the variant is already set to `destructive`. But if you use `Action::make()`, always remember to explicitly set the variant:
+
+```php
+Action::make('duplicate')
+    ->label('Duplicate')
+    ->variant('default') // Required inside ActionGroup
 ```
 
 ## Frontend Result
@@ -43,10 +56,22 @@ If a user doesn't have access to "Delete" an item (because the `visibleWhen()` e
 ActionGroup::make('More')
     ->actions([
         // ...
-        Action::make('delete')
-            ->label('Delete')
+        Action::delete()
             ->href(fn ($record) => route('users.destroy', $record))
             // The delete option will disappear from the dropdown if this row is locked
             ->visibleWhen(fn ($record) => !$record->is_locked) 
     ])
 ```
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `make(string $key)` | Creates a new action group instance. |
+| `label(string $label)` | Sets the dropdown trigger label. |
+| `icon(string $icon)` | Sets the dropdown trigger icon. |
+| `actions(array $actions)` | Registers the child Action objects inside the dropdown. |
+| `variant(ActionVariant\|string $variant)`| Sets the trigger button variant. |
+| `iconOnly(bool $value = true)` | Shows only the icon for the trigger button. |
+| `textOnly(bool $value = true)` | Shows only the text for the trigger button. |
+| `iconOnlyOnMobile(bool $value = true)` | Collapses text on mobile screens. |

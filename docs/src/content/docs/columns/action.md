@@ -44,4 +44,12 @@ $table = Table::model(User::class)
 ## Adding Actions
 
 The `->actions([...])` method of the `ActionColumn` expects an array of Action objects. 
-To learn how to create and configure these Action objects (including buttons, colors, icons, and groups), please read the comprehensive guide in the [Actions Overview](/actions/overview) section.
+To learn how to create and configure these Action objects (including buttons, colors, icons, and groups), please read the comprehensive guide in the [Action Buttons](/columns/action-buttons) section.
+
+## API Reference
+
+| Method | Description |
+|--------|-------------|
+| `make(string $key = '__actions')` | Creates a new action column instance. |
+| `actions(array $actions)` | Registers the action objects for this column. |
+| `hidden(bool $value = true)` | Hides the column from the table. |

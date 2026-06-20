@@ -82,6 +82,32 @@ Action::make('edit')
     ->icon('pencil') // Menginstruksikan frontend untuk menampilkan ikon pensil
 ```
 
+### Mode Tampilan (Display Modes)
+
+Terkadang Anda ingin sebuah aksi hanya menampilkan ikonnya saja (menyembunyikan teks) untuk menghemat ruang, atau sebaliknya, hanya menampilkan teks. Kinetics menyediakan *display modes* yang responsif bawaan dari *trait* `HasDisplayMode`.
+
+```php
+Action::make('view')
+    ->label('Lihat Detail')
+    ->icon('eye')
+    ->iconOnly() // Tombol hanya akan menampilkan ikon mata
+    
+Action::make('delete')
+    ->label('Hapus')
+    ->icon('trash')
+    ->textOnly() // Tombol hanya akan menampilkan teks 'Hapus', menyembunyikan ikon tempat sampah
+```
+
+**Tampilan Responsif:**
+Jika Anda ingin tombol menampilkan ikon dan teks sekaligus pada layar desktop, namun menyusut menjadi tombol khusus ikon (*icon-only*) di layar perangkat seluler, gunakan `iconOnlyOnMobile()`:
+
+```php
+Action::make('edit')
+    ->label('Edit')
+    ->icon('pencil')
+    ->iconOnlyOnMobile() // Teks terlihat di layar menengah/besar (md+), hanya ikon di layar kecil (sm)
+```
+
 ## Interaktivitas Lanjutan
 
 ### Dialog Konfirmasi (`confirm`)
@@ -114,3 +140,21 @@ Action::make('quick_edit')
     ->href(fn($row) => route('users.edit', $row['id']))
     ->modal()
 ```
+
+## Referensi API
+
+| Metode | Deskripsi |
+|--------|-------------|
+| `make(string $key)` | Creates a new action instance. |
+| `label(string $label)` | Sets the button label. |
+| `icon(string $icon)` | Sets the button icon. |
+| `variant(ActionVariant\|string $variant)` | Sets the button variant (e.g., default, outline, destructive). |
+| `href(string\|\Closure $href)` | Sets the target URL or route name. |
+| `method(string $method)`| Sets the HTTP method (get, post, put, delete, etc.). |
+| `confirm(...)` | Attaches a confirmation dialog to the action. |
+| `visibleWhen(bool\|\Closure $condition)`| Dynamically shows or hides the action per row. |
+| `disabledWhen(bool\|\Closure $condition)`| Dynamically enables or disables the action per row. |
+| `modal(bool $value = true)` | Opens the target link inside a modal. |
+| `iconOnly(bool $value = true)` | Hides the text and only shows the icon. |
+| `textOnly(bool $value = true)` | Hides the icon and only shows the text. |
+| `iconOnlyOnMobile(bool $value = true)` | Collapses text on mobile screens. |
