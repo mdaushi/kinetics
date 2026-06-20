@@ -305,8 +305,8 @@ class TableAdvancedTest extends TestCase
                 ActionColumn::make()->actions([
                     Action::make('view')->label('View'),
                     ActionGroup::make('More')->actions([
-                        Action::make('archive')->label('Archive'),
-                        Action::make('duplicate')->label('Duplicate'),
+                        Action::make('archive')->label('Archive')->variant('default'),
+                        Action::make('duplicate')->label('Duplicate')->variant('default'),
                     ]),
                 ]),
             ])

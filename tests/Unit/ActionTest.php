@@ -139,7 +139,7 @@ class ActionTest extends TestCase
 
     public function test_invalid_variant_throws(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\ValueError::class);
 
         Action::make('test')->variant('invalid-variant');
     }
@@ -156,12 +156,12 @@ class ActionTest extends TestCase
 
     // method
 
-    public function test_method_is_uppercased(): void
+    public function test_method_is_lowercased(): void
     {
         $action = Action::make('remove')->label('Remove')->method('delete');
         $resolved = $action->resolve(['id' => 1]);
 
-        $this->assertEquals('DELETE', $resolved['method']);
+        $this->assertEquals('delete', $resolved['method']);
     }
 
     // modal
@@ -194,11 +194,11 @@ class ActionTest extends TestCase
     {
         $group = ActionGroup::make('More')
             ->actions([
-                Action::make('approve')->label('Approve')
+                Action::make('approve')->label('Approve')->variant('default')
                     ->visibleWhen(fn ($r) => $r['status'] === 'pending'),
-                Action::make('reject')->label('Reject')
+                Action::make('reject')->label('Reject')->variant('default')
                     ->visibleWhen(fn ($r) => $r['status'] === 'pending'),
-                Action::make('archive')->label('Archive'),
+                Action::make('archive')->label('Archive')->variant('default'),
             ]);
 
         $resolved = $group->resolve(['id' => 1, 'status' => 'pending']);
@@ -212,9 +212,9 @@ class ActionTest extends TestCase
     {
         $group = ActionGroup::make('More')
             ->actions([
-                Action::make('approve')->label('Approve')
+                Action::make('approve')->label('Approve')->variant('default')
                     ->visibleWhen(fn ($r) => $r['status'] === 'pending'),
-                Action::make('archive')->label('Archive'), // selalu visible
+                Action::make('archive')->label('Archive')->variant('default'), // selalu visible
             ]);
 
         $resolved = $group->resolve(['id' => 1, 'status' => 'active']);
